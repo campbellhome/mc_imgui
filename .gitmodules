@@ -1,0 +1,6 @@
+[submodule "submodules/mc_common"]
+	path = submodules/mc_common
+	url = https://github.com/campbellhome/mc_common
+[submodule "submodules/imgui"]
+	path = submodules/imgui
+	url = https://github.com/ocornut/imgui

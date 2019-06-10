@@ -79,7 +79,7 @@ bool Fonts_UpdateAtlas(void)
 
 void Fonts_Menu(void)
 {
-	//ImGui::Checkbox("DEBUG Text Shadows", &g_config.textShadows);
+//ImGui::Checkbox("DEBUG Text Shadows", &g_config.textShadows);
 #if BB_USING(FEATURE_FREETYPE)
 	if(ImGui::Checkbox("DEBUG Use FreeType", &s_fonts.useFreeType)) {
 		Fonts_MarkAtlasForRebuild();

@@ -33,6 +33,8 @@ void Fonts_AddFont(fontConfig_t font);
 
 void Fonts_CacheGlyphs(const char *text);
 
+void Fonts_Shutdown(void);
+
 #if defined(__cplusplus)
 }
 #endif

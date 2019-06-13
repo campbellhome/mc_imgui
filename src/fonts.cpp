@@ -19,8 +19,6 @@ extern "C" void fontConfigs_reset(fontConfigs_t *val);
 
 static fontConfigs_t s_fontConfigs;
 
-void QueueUpdateDpiDependentResources();
-
 #if BB_USING(FEATURE_FREETYPE)
 
 // warning C4548: expression before comma has no effect; expected expression with side-effect
@@ -38,6 +36,11 @@ BB_WARNING_POP
 #pragma comment(lib, "freetype.lib")
 
 #endif // #if BB_USING(FEATURE_FREETYPE)
+
+extern "C" void Fonts_Shutdown(void)
+{
+	fontConfigs_reset(&s_fontConfigs);
+}
 
 struct fontBuilder {
 #if BB_USING(FEATURE_FREETYPE)
@@ -111,7 +114,7 @@ static bool Glyphs_CacheText(ImFontAtlas::GlyphRangesBuilder *glyphs, const char
 extern "C" void Fonts_CacheGlyphs(const char *text)
 {
 	if(Glyphs_CacheText(&s_glyphs, text)) {
-		QueueUpdateDpiDependentResources();
+		Imgui_Core_QueueUpdateDpiDependentResources();
 	}
 }
 
@@ -138,11 +141,14 @@ static void Fonts_MergeIconFont(float fontSize)
 extern "C" void Fonts_ClearFonts(void)
 {
 	fontConfigs_reset(&s_fontConfigs);
+	Imgui_Core_QueueUpdateDpiDependentResources();
 }
 
 extern "C" void Fonts_AddFont(fontConfig_t font)
 {
 	bba_push(s_fontConfigs, fontConfig_clone(&font));
+	Imgui_Core_QueueUpdateDpiDependentResources();
+	Imgui_Core_QueueUpdateDpiDependentResources();
 }
 
 void Fonts_InitFonts(void)

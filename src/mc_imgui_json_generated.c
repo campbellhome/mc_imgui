@@ -7,19 +7,13 @@
 
 #include "mc_imgui_json_generated.h"
 #include "bbclient/bb_array.h"
+#include "json_utils.h"
 #include "va.h"
 
 #include "fonts.h"
 #include "sb.h"
 #include "sdict.h"
 #include "uuid_rfc4122\sysdep.h"
-
-//////////////////////////////////////////////////////////////////////////
-
-int json_object_get_boolean_safe(const JSON_Object *object, const char *name)
-{
-	return json_value_get_boolean(json_object_get_value(object, name)) == 1;
-}
 
 //////////////////////////////////////////////////////////////////////////
 

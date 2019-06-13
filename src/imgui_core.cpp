@@ -3,6 +3,7 @@
 
 #include "imgui_core.h"
 #include "bbclient/bb_time.h"
+#include "cmdline.h"
 #include "common.h"
 #include "fonts.h"
 #include "imgui_themes.h"
@@ -48,8 +49,9 @@ static sb_t g_colorscheme;
 static int g_appRequestRenderCount;
 static bool g_shuttingDown;
 static bool g_bDirtyWindowPlacement;
+static bool g_setCmdline;
 
-extern "C" b32 Imgui_Core_Init(void)
+extern "C" b32 Imgui_Core_Init(const char *cmdline)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -66,6 +68,11 @@ extern "C" b32 Imgui_Core_Init(void)
 		g_d3dpp.EnableAutoDepthStencil = TRUE;
 		g_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 		g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE; // Present with vsync
+	}
+
+	if(!cmdline_argc()) {
+		g_setCmdline = true;
+		cmdline_init_composite(cmdline);
 	}
 
 	return s_pD3D != nullptr;
@@ -87,7 +94,12 @@ void Imgui_Core_ResetD3D()
 
 extern "C" void Imgui_Core_Shutdown(void)
 {
+	Fonts_Shutdown();
 	mb_shutdown();
+
+	if(g_setCmdline) {
+		cmdline_shutdown();
+	}
 
 	sb_reset(&g_colorscheme);
 
@@ -182,14 +194,9 @@ void UpdateDpiDependentResources()
 	Style_Apply(sb_get(&g_colorscheme));
 }
 
-void QueueUpdateDpiDependentResources()
-{
-	g_needUpdateDpiDependentResources = true;
-}
-
 extern "C" void Imgui_Core_QueueUpdateDpiDependentResources(void)
 {
-	QueueUpdateDpiDependentResources();
+	g_needUpdateDpiDependentResources = true;
 }
 
 BOOL EnableNonClientDpiScalingShim(_In_ HWND hwnd)
@@ -216,6 +223,12 @@ UINT GetDpiForWindowShim(_In_ HWND hwnd)
 		}
 	}
 	return USER_DEFAULT_SCREEN_DPI;
+}
+
+static Imgui_Core_UserWndProc *g_userWndProc;
+void Imgui_Core_SetUserWndProc(Imgui_Core_UserWndProc *wndProc)
+{
+	g_userWndProc = wndProc;
 }
 
 LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -309,6 +322,13 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	if(ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 
+	if(g_userWndProc) {
+		LRESULT userResult = (*g_userWndProc)(hWnd, msg, wParam, lParam);
+		if(userResult) {
+			return userResult;
+		}
+	}
+
 	switch(msg) {
 	case WM_MOVE:
 		Imgui_Core_RequestRender();
@@ -334,7 +354,7 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-extern "C" b32 Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp)
+extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp)
 {
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, Imgui_Core_WndProc, 0L, 0L, GetModuleHandle(NULL), icon, LoadCursor(NULL, IDC_ARROW), NULL, NULL, classname, NULL };
 	s_wc = wc;
@@ -362,7 +382,7 @@ extern "C" b32 Imgui_Core_InitWindow(const char *classname, const char *title, H
 		}
 	}
 
-	return s_wnd.hwnd != 0;
+	return s_wnd.hwnd;
 }
 
 extern "C" void Imgui_Core_ShutdownWindow(void)

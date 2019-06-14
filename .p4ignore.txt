@@ -10,3 +10,5 @@ vs/
 !vs/*.vcxproj
 !vs/*.vcxproj.filters
 !vs/*.props
+submodules/imgui/example_*/
+!submodules/imgui/example_win32*/

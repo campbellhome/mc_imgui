@@ -38,7 +38,7 @@ b32 Imgui_Core_GetAndClearDirtyWindowPlacement(void);
 
 void Imgui_Core_QueueUpdateDpiDependentResources(void);
 
-typedef LRESULT (Imgui_Core_UserWndProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef LRESULT(Imgui_Core_UserWndProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void Imgui_Core_SetUserWndProc(Imgui_Core_UserWndProc *WndProc);
 
 #if defined(__cplusplus)

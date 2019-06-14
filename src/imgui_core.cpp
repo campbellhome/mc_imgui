@@ -84,7 +84,7 @@ void Imgui_Core_ResetD3D()
 		return;
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 #ifdef NDEBUG
-	g_pd3dDevice->Reset(&g_d3dpp);
+	s_wnd.pd3dDevice->Reset(&g_d3dpp);
 #else
 	HRESULT hr = s_wnd.pd3dDevice->Reset(&g_d3dpp);
 	IM_ASSERT(hr != D3DERR_INVALIDCALL);

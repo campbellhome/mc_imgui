@@ -392,8 +392,6 @@ extern "C" void Imgui_Core_ShutdownWindow(void)
 		ImGui_ImplWin32_Shutdown();
 		s_wnd.pd3dDevice->Release();
 	}
-
-	BB_SHUTDOWN();
 }
 
 b32 Imgui_Core_BeginFrame(void)

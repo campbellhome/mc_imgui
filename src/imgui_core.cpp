@@ -16,6 +16,7 @@
 #include "wrap_shellscalingapi.h"
 
 #pragma comment(lib, "d3d9.lib")
+#pragma comment(lib, "xinput9_1_0.lib")
 
 static HRESULT SetProcessDpiAwarenessShim(_In_ PROCESS_DPI_AWARENESS value)
 {

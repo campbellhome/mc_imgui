@@ -2,7 +2,6 @@
 // MIT license (see License.txt)
 
 #include "mc_imgui_example.h"
-#include "cmdline.h"
 #include "common.h"
 #include "crt_leak_check.h"
 #include "fonts.h"
@@ -113,13 +112,14 @@ int CALLBACK WinMain(_In_ HINSTANCE /*Instance*/, _In_opt_ HINSTANCE /*PrevInsta
 {
 	crt_leak_check_init();
 
-	cmdline_init_composite(CommandLine);
-
 	BB_INIT_WITH_FLAGS("mc_imgui_example", kBBInitFlag_None);
 	BB_THREAD_SET_NAME("main");
 	BB_LOG("Startup", "Arguments: %s", CommandLine);
 
-	Imgui_Core_Init();
+	Imgui_Core_Init(CommandLine);
+
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	//ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	WINDOWPLACEMENT wp = { BB_EMPTY_INITIALIZER };
 	if(Imgui_Core_InitWindow("mc_imgui_example_wndclass", "mc_imgui_example", LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MAINICON)), wp)) {
@@ -139,7 +139,7 @@ int CALLBACK WinMain(_In_ HINSTANCE /*Instance*/, _In_opt_ HINSTANCE /*PrevInsta
 
 	Imgui_Core_Shutdown();
 
-	cmdline_shutdown();
+	BB_SHUTDOWN();
 
 	return 0;
 }

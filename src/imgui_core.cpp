@@ -462,6 +462,10 @@ void Imgui_Core_EndFrame(ImVec4 clear_col)
 			ImGui::EndFrame();
 			Imgui_Core_RequestRender();
 		}
+		if(ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 		HRESULT hr = s_wnd.pd3dDevice->Present(NULL, NULL, NULL, NULL);
 		if(FAILED(hr)) {
 			bb_sleep_ms(100);
@@ -469,6 +473,9 @@ void Imgui_Core_EndFrame(ImVec4 clear_col)
 			Imgui_Core_RequestRender();
 		}
 	} else {
+		if(ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			ImGui::UpdatePlatformWindows();
+		}
 		ImGui::EndFrame();
 		bb_sleep_ms(15);
 	}

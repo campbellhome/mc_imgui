@@ -309,7 +309,7 @@ namespace ImGui
 		SameLine(offset);
 		TextUnformatted(text, end);
 		PopClipRect();
-		if(contextMenuName && IsMouseClicked(1) && IsItemHoveredRect()) {
+		if(contextMenuName && IsMouseClicked(1) && IsItemHovered(ImGuiHoveredFlags_RectOnly)) {
 			OpenPopup(contextMenuName);
 		}
 	}
@@ -341,7 +341,7 @@ namespace ImGui
 				*h.sortDescending = false;
 			}
 		}
-		if(contextMenuName && IsMouseClicked(1) && IsItemHoveredRect()) {
+		if(contextMenuName && IsMouseClicked(1) && IsItemHovered(ImGuiHoveredFlags_RectOnly)) {
 			OpenPopup(contextMenuName);
 		}
 
@@ -390,7 +390,7 @@ namespace ImGui
 
 	bool BeginContextMenu(const char *name)
 	{
-		if(IsMouseClicked(1) && IsItemHoveredRect()) {
+		if(IsMouseClicked(1) && IsItemHovered(ImGuiHoveredFlags_RectOnly)) {
 			OpenPopup(name);
 		}
 		return BeginPopup(name);

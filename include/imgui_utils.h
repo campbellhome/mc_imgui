@@ -107,4 +107,6 @@ namespace ImGui
 	void SetActiveSelectables(const void *data);
 	bool IsActiveSelectables(const void *data);
 
+	ImGuiViewport *GetViewportForWindow(const char *windowName);
+
 } // namespace ImGui

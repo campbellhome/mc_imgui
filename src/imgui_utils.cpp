@@ -633,4 +633,16 @@ namespace ImGui
 		return s_activeSelectables == data;
 	}
 
+	ImGuiViewport *GetViewportForWindow(const char *windowName)
+	{
+		ImGuiWindow *window = FindWindowByName(windowName);
+		if(window) {
+			ImGuiViewport *viewport = FindViewportByID(window->ViewportId);
+			if(viewport) {
+				return viewport;
+			}
+		}
+		return GetMainViewport();
+	}
+
 } // namespace ImGui

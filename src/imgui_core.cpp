@@ -446,6 +446,9 @@ void Imgui_Core_EndFrame(ImVec4 clear_col)
 			}
 		}
 	}
+	if(ImGui::GetPlatformIO().Viewports.size() > 1) {
+		requestRender = true;
+	}
 
 	// ImGui Rendering
 	if(requestRender) {

@@ -18,6 +18,11 @@ void Imgui_Core_Shutdown(void);
 HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp);
 void Imgui_Core_ShutdownWindow(void);
 
+void Imgui_Core_SetCloseHidesWindow(b32 bCloseHidesWindow);
+void Imgui_Core_HideUnhideWindow(void);
+void Imgui_Core_UnhideWindow(void);
+void Imgui_Core_BringWindowToFront(void);
+
 void Imgui_Core_SetDpiScale(float dpiScale);
 float Imgui_Core_GetDpiScale(void);
 

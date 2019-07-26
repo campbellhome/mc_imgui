@@ -51,6 +51,7 @@ static int g_appRequestRenderCount;
 static bool g_shuttingDown;
 static bool g_bDirtyWindowPlacement;
 static bool g_setCmdline;
+static bool g_bCloseHidesWindow;
 
 extern "C" b32 Imgui_Core_Init(const char *cmdline)
 {
@@ -120,6 +121,57 @@ extern "C" b32 Imgui_Core_HasFocus(void)
 extern "C" float Imgui_Core_GetDpiScale(void)
 {
 	return g_dpiScale;
+}
+
+extern "C" void Imgui_Core_SetCloseHidesWindow(b32 bCloseHidesWindow)
+{
+	g_bCloseHidesWindow = bCloseHidesWindow;
+}
+
+extern "C" void Imgui_Core_HideUnhideWindow(void)
+{
+	if(s_wnd.hwnd) {
+		WINDOWPLACEMENT wp = { BB_EMPTY_INITIALIZER };
+		wp.length = sizeof(wp);
+		GetWindowPlacement(s_wnd.hwnd, &wp);
+		if(wp.showCmd == SW_SHOWMINIMIZED) {
+			ShowWindow(s_wnd.hwnd, SW_RESTORE);
+			Imgui_Core_BringWindowToFront();
+		} else if(!IsWindowVisible(s_wnd.hwnd)) {
+			ShowWindow(s_wnd.hwnd, SW_SHOW);
+			Imgui_Core_BringWindowToFront();
+		} else {
+			ShowWindow(s_wnd.hwnd, SW_HIDE);
+		}
+	}
+}
+
+extern "C" void Imgui_Core_UnhideWindow(void)
+{
+	if(s_wnd.hwnd) {
+		if(IsIconic(s_wnd.hwnd)) {
+			ShowWindow(s_wnd.hwnd, SW_RESTORE);
+		} else {
+			ShowWindow(s_wnd.hwnd, SW_SHOW);
+		}
+	}
+}
+
+extern "C" void Imgui_Core_BringWindowToFront(void)
+{
+	if(s_wnd.hwnd) {
+		if(!BringWindowToTop(s_wnd.hwnd)) {
+			char *errorMessage = nullptr;
+			DWORD lastError = GetLastError();
+			FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&errorMessage, 0, NULL);
+			BB_ERROR("Window", "Failed to bring window to front:\n  Error %u (0x%8.8X): %s",
+			         lastError, lastError, errorMessage ? errorMessage : "unable to format error message");
+			if(errorMessage) {
+				LocalFree(errorMessage);
+			}
+		}
+		SetForegroundWindow(s_wnd.hwnd);
+	}
 }
 
 extern "C" void Imgui_Core_SetDpiScale(float dpiScale)
@@ -315,6 +367,11 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_CHAR:
 		Imgui_Core_RequestRender();
 		break;
+	case WM_CLOSE:
+		if(g_bCloseHidesWindow) {
+			ShowWindow(hWnd, SW_HIDE);
+			return 0;
+		}
 	default:
 		break;
 	}

@@ -20,6 +20,7 @@ void Imgui_Core_ShutdownWindow(void);
 
 void Imgui_Core_SetCloseHidesWindow(b32 bCloseHidesWindow);
 void Imgui_Core_HideUnhideWindow(void);
+void Imgui_Core_HideWindow(void);
 void Imgui_Core_UnhideWindow(void);
 void Imgui_Core_BringWindowToFront(void);
 

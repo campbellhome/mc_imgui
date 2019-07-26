@@ -146,6 +146,13 @@ extern "C" void Imgui_Core_HideUnhideWindow(void)
 	}
 }
 
+extern "C" void Imgui_Core_HideWindow(void)
+{
+	if(s_wnd.hwnd) {
+		ShowWindow(s_wnd.hwnd, SW_HIDE);
+	}
+}
+
 extern "C" void Imgui_Core_UnhideWindow(void)
 {
 	if(s_wnd.hwnd) {

@@ -7,6 +7,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(mc_imgui_lib_PropsDir)..\include;$(mc_imgui_lib_PropsDir)..\submodules;$(mc_imgui_lib_PropsDir)..\submodules\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(mc_imgui_lib_PropsDir)..\submodules\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+	  <PreprocessorDefinitions>ImDrawIdx=unsigned int;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
 </Project>

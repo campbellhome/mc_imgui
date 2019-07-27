@@ -441,7 +441,11 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 			ImGui_ImplWin32_Init(s_wnd.hwnd);
 			ImGui_ImplDX9_Init(s_wnd.pd3dDevice);
 			Fonts_InitFonts();
-			ShowWindow(s_wnd.hwnd, wp.showCmd ? (int)wp.showCmd : SW_SHOWDEFAULT);
+			if(wp.showCmd == SW_HIDE && !g_bCloseHidesWindow) {
+				ShowWindow(s_wnd.hwnd, SW_SHOWDEFAULT);
+			} else {
+				ShowWindow(s_wnd.hwnd, (int)wp.showCmd);
+			}
 			UpdateWindow(s_wnd.hwnd);
 			Time_StartNewFrame();
 		}

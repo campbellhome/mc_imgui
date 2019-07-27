@@ -421,6 +421,11 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+typedef struct D3DCreateInfo_s {
+	D3DDEVTYPE deviceType;
+	DWORD vertexProcessingType;
+} D3DCreateInfo_t;
+
 extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp)
 {
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, Imgui_Core_WndProc, 0L, 0L, GetModuleHandle(NULL), icon, LoadCursor(NULL, IDC_ARROW), NULL, NULL, classname, NULL };
@@ -437,9 +442,17 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 	BB_LOG("Startup", "hwnd: %p", s_wnd.hwnd);
 
 	if(s_wnd.hwnd) {
-		if(s_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, s_wnd.hwnd, D3DCREATE_MIXED_VERTEXPROCESSING, &g_d3dpp, &s_wnd.pd3dDevice) < 0) {
-			s_wnd.pd3dDevice = nullptr;
-		} else {
+		D3DCreateInfo_t d3dCreateInfo[] = {
+			{ D3DDEVTYPE_HAL, D3DCREATE_MIXED_VERTEXPROCESSING },
+			{ D3DDEVTYPE_HAL, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
+			{ D3DDEVTYPE_SW, D3DCREATE_MIXED_VERTEXPROCESSING },
+			{ D3DDEVTYPE_SW, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
+		};
+		b32 bOk = false;
+		for(u32 i = 0; !bOk && i < BB_ARRAYSIZE(d3dCreateInfo); ++i) {
+			bOk = s_pD3D->CreateDevice(D3DADAPTER_DEFAULT, d3dCreateInfo[i].deviceType, s_wnd.hwnd, d3dCreateInfo[i].vertexProcessingType, &g_d3dpp, &s_wnd.pd3dDevice) >= 0;
+		}
+		if(bOk) {
 			ImGui_ImplWin32_Init(s_wnd.hwnd);
 			ImGui_ImplDX9_Init(s_wnd.pd3dDevice);
 			Fonts_InitFonts();
@@ -450,6 +463,8 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 			}
 			UpdateWindow(s_wnd.hwnd);
 			Time_StartNewFrame();
+		} else {
+			s_wnd.pd3dDevice = nullptr;
 		}
 	}
 

@@ -161,6 +161,7 @@ extern "C" void Imgui_Core_UnhideWindow(void)
 		} else {
 			ShowWindow(s_wnd.hwnd, SW_SHOW);
 		}
+		Imgui_Core_RequestRender();
 	}
 }
 
@@ -178,6 +179,7 @@ extern "C" void Imgui_Core_BringWindowToFront(void)
 			}
 		}
 		SetForegroundWindow(s_wnd.hwnd);
+		Imgui_Core_RequestRender();
 	}
 }
 

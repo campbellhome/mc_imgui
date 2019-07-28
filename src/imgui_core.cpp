@@ -513,26 +513,25 @@ void Imgui_Core_EndFrame(ImVec4 clear_col)
 	UIMessageBox_Update();
 	ImGui::EndFrame();
 
-	bool requestRender = Imgui_Core_GetAndClearRequestRender() || key_is_any_down_or_released_this_frame();
-	if(g_hasFocus) {
-		ImGuiIO &io = ImGui::GetIO();
-		for(bool mouseDown : io.MouseDown) {
-			if(mouseDown) {
+	ImGuiIO &io = ImGui::GetIO();
+	bool requestRender = Imgui_Core_GetAndClearRequestRender() ||
+	                     key_is_any_down_or_released_this_frame() ||
+	                     io.MouseHoveredViewport != 0 ||
+	                     io.MouseWheel != 0.0f ||
+	                     io.MouseWheelH != 0.0f;
+	for(bool mouseDown : io.MouseDown) {
+		if(mouseDown) {
+			requestRender = true;
+			break;
+		}
+	}
+	if(!requestRender) {
+		for(bool keyDown : io.KeysDown) {
+			if(keyDown) {
 				requestRender = true;
 				break;
 			}
 		}
-		if(!requestRender) {
-			for(bool keyDown : io.KeysDown) {
-				if(keyDown) {
-					requestRender = true;
-					break;
-				}
-			}
-		}
-	}
-	if(ImGui::GetPlatformIO().Viewports.size() > 1) {
-		requestRender = true;
 	}
 
 	// ImGui Rendering

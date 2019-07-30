@@ -85,6 +85,16 @@ namespace ImGui
 		return IsKeyPressed(GetKeyIndex(key), repeat);
 	}
 
+	bool IsCurrentWindowMoving(void)
+	{
+		return GetCurrentContext()->MovingWindow == GetCurrentWindow();
+	}
+
+	bool IsAnyWindowMoving(void)
+	{
+		return GetCurrentContext()->MovingWindow != nullptr;
+	}
+
 	bool InputText(const char *label, sb_t *sb, u32 buf_size, ImGuiInputTextFlags flags, ImGuiTextEditCallback callback, void *user_data)
 	{
 		if(sb->allocated < buf_size) {

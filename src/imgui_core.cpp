@@ -432,7 +432,17 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 	s_wc = wc;
 	RegisterClassEx(&s_wc);
 
-	s_wnd.hwnd = CreateWindow(classname, title, WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, s_wc.hInstance, NULL);
+	int x = 100;
+	int y = 100;
+	int w = 1280;
+	int h = 800;
+	if(wp.rcNormalPosition.right > wp.rcNormalPosition.left) {
+		x = wp.rcNormalPosition.left;
+		y = wp.rcNormalPosition.top;
+		w = wp.rcNormalPosition.right - wp.rcNormalPosition.left;
+		h = wp.rcNormalPosition.bottom - wp.rcNormalPosition.top;
+	}
+	s_wnd.hwnd = CreateWindow(classname, title, WS_OVERLAPPEDWINDOW, x, y, w, h, NULL, NULL, s_wc.hInstance, NULL);
 	if(wp.rcNormalPosition.right > wp.rcNormalPosition.left) {
 		if(wp.showCmd == SW_SHOWMINIMIZED) {
 			wp.showCmd = SW_SHOWNORMAL;

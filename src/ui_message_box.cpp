@@ -3,7 +3,7 @@
 
 #include "ui_message_box.h"
 
-#include "bbclient/bb_string.h"
+#include "bb_string.h"
 #include "imgui_core.h"
 #include "imgui_utils.h"
 #include "message_box.h"

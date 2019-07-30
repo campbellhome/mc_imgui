@@ -2,7 +2,7 @@
 // MIT license (see License.txt)
 
 #include "fonts.h"
-#include "bbclient/bb_array.h"
+#include "bb_array.h"
 #include "common.h"
 #include "imgui_core.h"
 #include "imgui_utils.h"

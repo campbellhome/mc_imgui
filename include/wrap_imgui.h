@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2019 Matt Campbell
 // MIT license (see License.txt)
 
-#include "bbclient/bb_common.h"
+#include "bb_common.h"
 
 #if BB_USING(BB_PLATFORM_WINDOWS)
 

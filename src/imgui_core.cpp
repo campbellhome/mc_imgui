@@ -2,7 +2,7 @@
 // MIT license (see License.txt)
 
 #include "imgui_core.h"
-#include "bbclient/bb_time.h"
+#include "bb_time.h"
 #include "cmdline.h"
 #include "common.h"
 #include "fonts.h"

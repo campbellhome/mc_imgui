@@ -6,7 +6,7 @@
 // clang-format off
 
 #include "mc_imgui_structs_generated.h"
-#include "bbclient/bb_array.h"
+#include "bb_array.h"
 #include "va.h"
 
 #include "fonts.h"

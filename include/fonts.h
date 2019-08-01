@@ -12,6 +12,7 @@ void Fonts_MarkAtlasForRebuild(void);
 bool Fonts_UpdateAtlas(void);
 void Fonts_Menu(void);
 void Fonts_InitFonts(void);
+sb_t Fonts_GetSystemFontDir(void);
 
 extern "C" {
 #endif

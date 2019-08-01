@@ -6,6 +6,7 @@
 #include "cmdline.h"
 #include "common.h"
 #include "fonts.h"
+#include "imgui_image.h"
 #include "imgui_themes.h"
 #include "keys.h"
 #include "message_box.h"
@@ -85,6 +86,7 @@ void Imgui_Core_ResetD3D()
 	if(!s_wnd.pd3dDevice)
 		return;
 	ImGui_ImplDX9_InvalidateDeviceObjects();
+	ImGui_Image_InvalidateDeviceObjects();
 #ifdef NDEBUG
 	s_wnd.pd3dDevice->Reset(&g_d3dpp);
 #else
@@ -465,6 +467,7 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 		}
 		if(bOk) {
 			ImGui_ImplWin32_Init(s_wnd.hwnd);
+			ImGui_Image_Init(s_wnd.pd3dDevice);
 			ImGui_ImplDX9_Init(s_wnd.pd3dDevice);
 			Fonts_InitFonts();
 			if(wp.showCmd == SW_HIDE && !g_bCloseHidesWindow) {
@@ -486,6 +489,7 @@ extern "C" void Imgui_Core_ShutdownWindow(void)
 {
 	if(s_wnd.pd3dDevice) {
 		ImGui_ImplDX9_Shutdown();
+		ImGui_Image_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		s_wnd.pd3dDevice->Release();
 	}
@@ -510,6 +514,7 @@ b32 Imgui_Core_BeginFrame(void)
 		Imgui_Core_ResetD3D();
 	}
 
+	ImGui_Image_NewFrame();
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();

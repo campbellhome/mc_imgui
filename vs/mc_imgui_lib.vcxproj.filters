@@ -43,6 +43,9 @@
     <ClCompile Include="..\src\mc_imgui_structs_generated.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\imgui_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\submodules\imgui\imconfig.h">
@@ -102,6 +105,12 @@
     <ClInclude Include="..\include\mc_imgui_structs_generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\imgui_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\submodules\stb\stb_image.h">
+      <Filter>stb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -112,6 +121,9 @@
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{f40bba29-2034-4ab8-8e19-e33a31fc7379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stb">
+      <UniqueIdentifier>{6edc091d-7611-4d46-8af1-307125a18c7c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include "crt_leak_check.h"
 #include "fonts.h"
 #include "imgui_core.h"
+#include "imgui_image.h"
 #include "message_box.h"
 
 static bool s_showImguiDemo;
@@ -13,6 +14,7 @@ static bool s_showImguiAbout;
 static bool s_showImguiMetrics;
 static bool s_showImguiUserGuide;
 static bool s_showImguiStyleEditor;
+static UserImageId s_imageId;
 
 static const char *s_colorschemes[] = {
 	"ImGui Dark",
@@ -22,7 +24,7 @@ static const char *s_colorschemes[] = {
 	"Windows",
 };
 
-void MC_Imgui_Example_MainMenuBar(void)
+static void MC_Imgui_Example_MainMenuBar(void)
 {
 	if(ImGui::BeginMainMenuBar()) {
 		if(ImGui::BeginMenu("File")) {
@@ -87,9 +89,33 @@ void MC_Imgui_Example_MainMenuBar(void)
 	}
 }
 
+static void MC_Imgui_Example_Image(void)
+{
+	if(s_imageId.id) {
+		UserImageData image = ImGui_Image_Get(s_imageId);
+		if(image.texture) {
+			ImVec2 windowSize = ImGui::GetContentRegionAvail();
+			if(windowSize.x >= (float)image.width) {
+				windowSize.x = (float)image.width;
+			}
+			if(windowSize.y >= (float)image.height) {
+				windowSize.y = (float)image.height;
+			}
+			ImVec2 constrainedSize = ImGui_Image_Constrain(image, windowSize);
+			ImVec2 start = ImGui::GetWindowPos();
+			start.x += 20.0f;
+			start.y += 20.0f;
+			ImVec2 end(start.x + constrainedSize.x, start.y + constrainedSize.y);
+			ImDrawList *drawList = ImGui::GetWindowDrawList();
+			drawList->AddImage(image.texture, start, end, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 0xFFFFFFFF);
+		}
+	}
+}
+
 void MC_Imgui_Example_Update(void)
 {
 	MC_Imgui_Example_MainMenuBar();
+	MC_Imgui_Example_Image();
 
 	if(s_showImguiDemo) {
 		ImGui::ShowDemoWindow(&s_showImguiDemo);
@@ -123,6 +149,7 @@ int CALLBACK WinMain(_In_ HINSTANCE /*Instance*/, _In_opt_ HINSTANCE /*PrevInsta
 
 	WINDOWPLACEMENT wp = { BB_EMPTY_INITIALIZER };
 	if(Imgui_Core_InitWindow("mc_imgui_example_wndclass", "mc_imgui_example", LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MAINICON)), wp)) {
+		s_imageId = ImGui_Image_CreateFromFile(R"(..\examples\mc_imgui_example.png)");
 
 		while(!Imgui_Core_IsShuttingDown()) {
 			if(Imgui_Core_GetAndClearDirtyWindowPlacement()) {
@@ -134,6 +161,7 @@ int CALLBACK WinMain(_In_ HINSTANCE /*Instance*/, _In_opt_ HINSTANCE /*PrevInsta
 				Imgui_Core_EndFrame(clear_col);
 			}
 		}
+		ImGui_Image_MarkForDestroy(s_imageId);
 		Imgui_Core_ShutdownWindow();
 	}
 

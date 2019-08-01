@@ -182,16 +182,16 @@ void Fonts_InitFonts(void)
 	Fonts_MarkAtlasForRebuild();
 }
 
-sb_t Fonts_GetSystemFontDir(void)
+extern "C" sb_t Fonts_GetSystemFontDir(void)
 {
 	sb_t dir = { BB_EMPTY_INITIALIZER };
 	PWSTR wpath;
-	if(SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &wpath) == S_OK) {
+	if(SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &wpath) == S_OK) {
 		sb_reserve(&dir, (u32)(wcslen(wpath) * 2));
 		if(dir.data) {
 			size_t numCharsConverted = 0;
 			wcstombs_s(&numCharsConverted, dir.data, dir.allocated, wpath, _TRUNCATE);
-			dir.count = (u32)strlen(dir.data);
+			dir.count = (u32)strlen(dir.data) + 1;
 		}
 	}
 	return dir;

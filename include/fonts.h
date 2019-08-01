@@ -12,7 +12,6 @@ void Fonts_MarkAtlasForRebuild(void);
 bool Fonts_UpdateAtlas(void);
 void Fonts_Menu(void);
 void Fonts_InitFonts(void);
-sb_t Fonts_GetSystemFontDir(void);
 
 extern "C" {
 #endif
@@ -33,6 +32,8 @@ void Fonts_ClearFonts(void);
 void Fonts_AddFont(fontConfig_t font);
 
 void Fonts_CacheGlyphs(const char *text);
+
+sb_t Fonts_GetSystemFontDir(void);
 
 void Fonts_Shutdown(void);
 

@@ -179,6 +179,7 @@ extern "C" void Imgui_Core_BringWindowToFront(void)
 			}
 		}
 		SetForegroundWindow(s_wnd.hwnd);
+		SetFocus(s_wnd.hwnd);
 		Imgui_Core_RequestRender();
 	}
 }

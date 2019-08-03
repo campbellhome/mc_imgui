@@ -11,6 +11,7 @@
 #include "keys.h"
 #include "message_box.h"
 #include "sb.h"
+#include "system_error_utils.h"
 #include "time_utils.h"
 #include "ui_message_box.h"
 #include "wrap_imgui.h"
@@ -171,17 +172,14 @@ extern "C" void Imgui_Core_BringWindowToFront(void)
 {
 	if(s_wnd.hwnd) {
 		if(!BringWindowToTop(s_wnd.hwnd)) {
-			char *errorMessage = nullptr;
-			DWORD lastError = GetLastError();
-			FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&errorMessage, 0, NULL);
-			BB_ERROR("Window", "Failed to bring window to front:\n  Error %u (0x%8.8X): %s",
-			         lastError, lastError, errorMessage ? errorMessage : "unable to format error message");
-			if(errorMessage) {
-				LocalFree(errorMessage);
-			}
+			system_error_to_log(GetLastError(), "Window", "BringWindowToTop");
 		}
-		SetForegroundWindow(s_wnd.hwnd);
-		SetFocus(s_wnd.hwnd);
+		if(!SetForegroundWindow(s_wnd.hwnd)) {
+			system_error_to_log(GetLastError(), "Window", "SetForegroundWindow");
+		}
+		if(!SetFocus(s_wnd.hwnd)) {
+			system_error_to_log(GetLastError(), "Window", "SetFocus");
+		}
 		Imgui_Core_RequestRender();
 	}
 }

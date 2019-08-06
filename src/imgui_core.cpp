@@ -54,6 +54,9 @@ static bool g_shuttingDown;
 static bool g_bDirtyWindowPlacement;
 static bool g_setCmdline;
 static bool g_bCloseHidesWindow;
+static HWINEVENTHOOK s_hWinEventHook;
+
+static void CALLBACK Imgui_Core_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
 
 extern "C" b32 Imgui_Core_Init(const char *cmdline)
 {
@@ -62,6 +65,11 @@ extern "C" b32 Imgui_Core_Init(const char *cmdline)
 	Style_Init();
 
 	SetProcessDpiAwarenessShim(PROCESS_PER_MONITOR_DPI_AWARE);
+
+	s_hWinEventHook = SetWinEventHook(
+	    EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
+	    NULL, Imgui_Core_WinEventProc, 0, 0,
+	    WINEVENT_OUTOFCONTEXT);
 
 	s_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 
@@ -101,6 +109,10 @@ extern "C" void Imgui_Core_Shutdown(void)
 {
 	Fonts_Shutdown();
 	mb_shutdown();
+
+	if(s_hWinEventHook) {
+		UnhookWinEvent(s_hWinEventHook);
+	}
 
 	if(g_setCmdline) {
 		cmdline_shutdown();
@@ -288,6 +300,32 @@ UINT GetDpiForWindowShim(_In_ HWND hwnd)
 	return USER_DEFAULT_SCREEN_DPI;
 }
 
+static void CALLBACK Imgui_Core_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+	// Idea to hook accessibility events comes from https://devblogs.microsoft.com/oldnewthing/20130930-00/?p=3083
+	BB_UNUSED(hWinEventHook);
+	BB_UNUSED(dwEventThread);
+	BB_UNUSED(dwmsEventTime);
+	if(hwnd &&
+	   idObject == OBJID_WINDOW &&
+	   idChild == CHILDID_SELF &&
+	   event == EVENT_SYSTEM_FOREGROUND) {
+		DWORD processId = 0;
+		b32 bSameProcess = false;
+		if(GetWindowThreadProcessId(hwnd, &processId)) {
+			bSameProcess = processId == GetCurrentProcessId();
+		}
+		if(bSameProcess) {
+			g_hasFocus = true;
+		} else if(g_hasFocus) {
+			g_hasFocus = false;
+			key_clear_all();
+			auto &keysDown = ImGui::GetIO().KeysDown;
+			memset(&keysDown, 0, sizeof(keysDown));
+		}
+	}
+}
+
 static Imgui_Core_UserWndProc *g_userWndProc;
 void Imgui_Core_SetUserWndProc(Imgui_Core_UserWndProc *wndProc)
 {
@@ -322,17 +360,6 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		             SWP_NOZORDER | SWP_NOACTIVATE);
 		break;
 	}
-	case WM_SETFOCUS:
-		g_hasFocus = true;
-		//ImGui::GetIO().MouseDrawCursor = true;
-		break;
-	case WM_KILLFOCUS: {
-		g_hasFocus = false;
-		//ImGui::GetIO().MouseDrawCursor = false;
-		key_clear_all();
-		auto &keysDown = ImGui::GetIO().KeysDown;
-		memset(&keysDown, 0, sizeof(keysDown));
-	} break;
 	case WM_MOUSEMOVE:
 		Imgui_Core_RequestRender();
 		if(!g_trackingMouse) {
@@ -351,20 +378,6 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		ImGui::GetIO().MousePos = ImVec2(-1, -1);
 		for(int i = 0; i < BB_ARRAYSIZE(ImGui::GetIO().MouseDown); ++i) {
 			ImGui::GetIO().MouseDown[i] = false;
-		}
-		break;
-	case WM_KEYDOWN:
-		if(wParam >= VK_F1 && wParam <= VK_F12) {
-			key_on_pressed((key_e)(Key_F1 + wParam - VK_F1));
-		} else if(wParam == VK_OEM_3) {
-			key_on_pressed(Key_Tilde);
-		}
-		break;
-	case WM_KEYUP:
-		if(wParam >= VK_F1 && wParam <= VK_F12) {
-			key_on_released((key_e)(Key_F1 + wParam - VK_F1));
-		} else if(wParam == VK_OEM_3) {
-			key_on_released(Key_Tilde);
 		}
 		break;
 	case WM_LBUTTONDOWN:
@@ -493,6 +506,23 @@ extern "C" void Imgui_Core_ShutdownWindow(void)
 	}
 }
 
+static int s_KeyToVK[] = {
+	VK_F1,
+	VK_F2,
+	VK_F3,
+	VK_F4,
+	VK_F5,
+	VK_F6,
+	VK_F7,
+	VK_F8,
+	VK_F9,
+	VK_F10,
+	VK_F11,
+	VK_F12,
+	VK_OEM_3,
+};
+BB_CTASSERT(BB_ARRAYSIZE(s_KeyToVK) == Key_Count);
+
 b32 Imgui_Core_BeginFrame(void)
 {
 	MSG msg = { BB_EMPTY_INITIALIZER };
@@ -516,6 +546,19 @@ b32 Imgui_Core_BeginFrame(void)
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+	ImGuiIO &io = ImGui::GetIO();
+	for(int i = 0; i < Key_Count; ++i) {
+		b32 bDown = io.KeysDown[s_KeyToVK[i]];
+		key_e key = (key_e)i;
+		if(bDown != key_is_down(key)) {
+			if(bDown) {
+				key_on_pressed(key);
+			} else {
+				key_on_released(key);
+			}
+		}
+	}
 
 	BB_TICK();
 

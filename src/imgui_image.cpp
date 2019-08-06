@@ -70,7 +70,7 @@ UserImageId ImGui_Image_CreateFromFile(const char *path)
 	int channelsInFile = 0;
 	u8 *pixelData = stbi_load(path, &width, &height, &channelsInFile, 4);
 	if(pixelData) {
-		for(int i = 0; i < width * height; ++i) {
+		for(s64 i = 0; i < width * height; ++i) {
 			u8 *pixel = pixelData + 4 * i;
 			u8 tmp = pixel[0];
 			pixel[0] = pixel[2];
@@ -152,7 +152,7 @@ void ImGui_Image_CreateDeviceObject(UserImageData *data)
 	if(g_pImageDevice->CreateTexture((UINT)data->width, (UINT)data->height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &data->texture, nullptr) >= 0) {
 		D3DLOCKED_RECT lockedRect;
 		if(data->texture->LockRect(0, &lockedRect, NULL, 0) == D3D_OK) {
-			for(int y = 0; y < data->height; ++y) {
+			for(s64 y = 0; y < data->height; ++y) {
 				memcpy((unsigned char *)lockedRect.pBits + lockedRect.Pitch * y, data->pixelData + (data->width * 4) * y, (size_t)(data->width * 4));
 			}
 			data->texture->UnlockRect(0);

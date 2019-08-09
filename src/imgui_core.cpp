@@ -7,6 +7,7 @@
 #include "common.h"
 #include "fonts.h"
 #include "imgui_image.h"
+#include "imgui_input_text.h"
 #include "imgui_themes.h"
 #include "keys.h"
 #include "message_box.h"
@@ -107,6 +108,7 @@ void Imgui_Core_ResetD3D()
 
 extern "C" void Imgui_Core_Shutdown(void)
 {
+	ImGui::InputTextShutdown();
 	Fonts_Shutdown();
 	mb_shutdown();
 

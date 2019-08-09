@@ -99,6 +99,7 @@
     <ClInclude Include="..\include\forkawesome-webfont.h" />
     <ClInclude Include="..\include\imgui_core.h" />
     <ClInclude Include="..\include\imgui_image.h" />
+    <ClInclude Include="..\include\imgui_input_text.h" />
     <ClInclude Include="..\include\imgui_themes.h" />
     <ClInclude Include="..\include\imgui_utils.h" />
     <ClInclude Include="..\include\keys.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="..\src\fonts.cpp" />
     <ClCompile Include="..\src\imgui_core.cpp" />
     <ClCompile Include="..\src\imgui_image.cpp" />
+    <ClCompile Include="..\src\imgui_input_text.cpp" />
     <ClCompile Include="..\src\imgui_themes.cpp" />
     <ClCompile Include="..\src\imgui_utils.cpp" />
     <ClCompile Include="..\src\keys.c" />

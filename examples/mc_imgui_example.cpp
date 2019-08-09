@@ -7,6 +7,7 @@
 #include "fonts.h"
 #include "imgui_core.h"
 #include "imgui_image.h"
+#include "imgui_input_text.h"
 #include "message_box.h"
 
 static bool s_showImguiDemo;
@@ -112,10 +113,29 @@ static void MC_Imgui_Example_Image(void)
 	}
 }
 
+static char s_inputBuffer[8192];
 void MC_Imgui_Example_Update(void)
 {
 	MC_Imgui_Example_MainMenuBar();
 	MC_Imgui_Example_Image();
+
+	if(ImGui::Begin("InputTest")) {
+		if(ImGui::Button("Copy Long Line 1")) {
+			ImGui::SetClipboardText("This is a reasonably long line, which one might expect to wrap in a tooltip, even though it does not in the log view.  It *should* wrap at 600px in the tooltip.  At least, it did when this was written.  That might have changed by now, but the point remains - this is a long log line.");
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Copy Long Line 2")) {
+			ImGui::SetClipboardText("Really long log line to test exceeding normal blackbox packet length.  ^1Really long log line to test exceeding normal blackbox packet length.  ^2Really long log line to test exceeding normal blackbox packet length.  ^3Really long log line to test exceeding normal blackbox packet length.  ^4Really long log line to test exceeding normal blackbox packet length.  ^5Really long log line to test exceeding normal blackbox packet length.  ^6Really long log line to test exceeding normal blackbox packet length.  ^7Really long log line to test exceeding normal blackbox packet length.  ^8Really long log line to test exceeding normal blackbox packet length.  ^9Really long log line to test exceeding normal blackbox packet length.  ^:Really long log line to test exceeding normal blackbox packet length.  ^<Really long log line to test exceeding normal blackbox packet length.  ^0Really long log line to test exceeding normal blackbox packet length.  ^1Really long log line to test exceeding normal blackbox packet length.  ^2Really long log line to test exceeding normal blackbox packet length.  ^3Really long log line to test exceeding normal blackbox packet length.  ^4Really long log line to test exceeding normal blackbox packet length.  ^5Really long log line to test exceeding normal blackbox packet length.  ^6Really long log line to test exceeding normal blackbox packet length.  ^7Really long log line to test exceeding normal blackbox packet length.  ^8Really long log line to test exceeding normal blackbox packet length.  ^9Really long log line to test exceeding normal blackbox packet length.  ^:Really long log line to test exceeding normal blackbox packet length.  ^<Really long log line to test exceeding normal blackbox packet length.^F  ^0Really long log line to test exceeding normal blackbox packet length.  ^1Really long log line to test exceeding normal blackbox packet length.  ^2Really long log line to test exceeding normal blackbox packet length.  --------------------------------------------------> ^<(2k packet limit here)^3Really long log line to test exceeding normal blackbox packet length.  ^4Really long log line to test exceeding normal blackbox packet length.  ^5Really long log line to test exceeding normal blackbox packet length.  ^6Really long log line to test exceeding normal blackbox packet length.  ^7Really long log line to test exceeding normal blackbox packet length.  ^8Really long log line to test exceeding normal blackbox packet length.  ^9Really long log line to test exceeding normal blackbox packet length.  ^:Really long log line to test exceeding normal blackbox packet length.  ^<Really long log line to test exceeding normal blackbox packet length. ^F  ^0Really long log line to test exceeding normal blackbox packet length.  ^1Really long log line to test exceeding normal blackbox packet length.  ^2Really long log line to test exceeding normal blackbox packet length.  ^3Really long log line to test exceeding normal blackbox packet length.  ^4Really long log line to test exceeding normal blackbox packet length.  ^5Really long log line to test exceeding normal blackbox packet length.  ^6Really long log line to test exceeding normal blackbox packet length.  ^7Really long log line to test exceeding normal blackbox packet length.  ^8Really long log line to test exceeding normal blackbox packet length.  ^9Really long log line to test exceeding normal blackbox packet length.  ^:Really long log line to test exceeding normal blackbox packet length.  ^<Really long log line to test exceeding normal blackbox packet length.  End at 3596.");
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Copy Tall Lines")) {
+			ImGui::SetClipboardText("1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n-------------\n");
+		}
+
+		ImVec2 inputSize(1000.0f, 400.0f);
+		ImGui::InputTextMultilineScrolling("##InputTest", s_inputBuffer, sizeof(s_inputBuffer), inputSize, ImGuiInputTextFlags_None);
+	}
+	ImGui::End();
 
 	if(s_showImguiDemo) {
 		ImGui::ShowDemoWindow(&s_showImguiDemo);

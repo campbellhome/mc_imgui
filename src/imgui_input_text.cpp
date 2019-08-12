@@ -40,6 +40,11 @@ typedef struct MultilineScrollStates_s {
 
 static MultilineScrollStates_t s_multilineScrollStates;
 
+namespace ImGui
+{
+	static bool InputTextScrollingEx(const char *label, char *buf, size_t buf_size, const ImVec2 &size, ImGuiInputTextFlags flags);
+}
+
 void ImGui::InputTextShutdown(void)
 {
 	for(u32 i = 0; i < s_multilineScrollStates.count; ++i) {
@@ -115,9 +120,10 @@ static int Imgui_Core_InputTextMultilineScrollingCallback(ImGuiTextEditCallbackD
 	return 0;
 }
 
-bool ImGui::InputTextMultilineScrolling(const char *label, char *buf, size_t buf_size, const ImVec2 &size, ImGuiInputTextFlags flags)
+static bool ImGui::InputTextScrollingEx(const char *label, char *buf, size_t buf_size, const ImVec2 &size, ImGuiInputTextFlags flags)
 {
 	const char *labelVisibleEnd = FindRenderedTextEnd(label);
+	bool bMultiline = (flags & ImGuiInputTextFlags_Multiline) != 0;
 
 	ImVec2 textSize = CalcTextSize(buf);
 	float scrollbarSize = GetStyle().ScrollbarSize;
@@ -127,35 +133,45 @@ bool ImGui::InputTextMultilineScrolling(const char *label, char *buf, size_t buf
 	if(size.x > 0.0f) {
 		availSize.x = size.x;
 	} else if(size.x < 0.0f) {
-		availSize.x -= size.x;
+		availSize.x += size.x;
+	} else {
+		availSize.x = CalcItemWidth();
 	}
 	if(size.y > 0.0f) {
 		availSize.y = size.y;
 	} else if(size.y < 0.0f) {
-		availSize.y -= size.y;
+		availSize.y += size.y;
 	}
-	float childWidth = size.x;
-	if(size.x == 0.0f) {
-		if(labelWidth > 0.0f) {
-			childWidth = -labelWidth;
-		} else {
-			childWidth = 0.0f;
-		}
+	float childWidth = availSize.x;
+	if(labelWidth > 0.0f) {
+		childWidth = -labelWidth;
 	}
 	float childHeight = size.y;
-	float textBoxWidth = availSize.x - scrollbarSize;
-	if(textSize.x > childWidth * 0.8f) {
-		textBoxWidth = textSize.x + childWidth * 0.8f;
+	float textBoxWidth = availSize.x - (bMultiline ? scrollbarSize : 0.0f);
+	if(textSize.x > textBoxWidth * 0.8f) {
+		textBoxWidth = textSize.x + textBoxWidth * 0.8f;
 	}
 	float textBoxHeight = 0.0f;
 	if(childHeight < 0) {
-		textBoxHeight = availSize.y + childHeight - scrollbarSize - GetStyle().FramePadding.y;
+		textBoxHeight = availSize.y + childHeight - GetStyle().FramePadding.y - scrollbarSize;
 	} else if(childHeight > 0.0f) {
-		textBoxHeight = childHeight - scrollbarSize - GetStyle().FramePadding.y;
+		textBoxHeight = childHeight - GetStyle().FramePadding.y - scrollbarSize;
 	}
-	float minTextBoxHeight = textSize.y + 2.0f * GetTextLineHeightWithSpacing();
+	float minTextBoxHeight = textSize.y + 2.0f * GetStyle().FramePadding.y;
+	if(bMultiline) {
+		minTextBoxHeight += 2.0f * GetTextLineHeightWithSpacing();
+	} else {
+		childHeight = minTextBoxHeight + scrollbarSize;
+	}
 	if(textBoxHeight < minTextBoxHeight) {
 		textBoxHeight = minTextBoxHeight;
+	}
+
+	if(bMultiline && textBoxHeight < childHeight && textBoxWidth <= childWidth) {
+		textBoxHeight = childHeight;
+	}
+	if(textBoxWidth < childWidth && textBoxHeight <= childHeight) {
+		textBoxWidth = childWidth;
 	}
 
 	ImGuiID scrollStateKey = GetID("textInputScrollState");
@@ -171,7 +187,8 @@ bool ImGui::InputTextMultilineScrolling(const char *label, char *buf, size_t buf
 	if(!scrollState)
 		return false;
 
-	BeginChild(label, ImVec2(childWidth, childHeight), false, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGuiWindowFlags childFlags = ImGuiWindowFlags_HorizontalScrollbar;
+	BeginChild(label, ImVec2(childWidth, childHeight), false, childFlags);
 	scrollState->scrollRegionX = ImMax(0.0f, GetWindowWidth() - scrollbarSize);
 	scrollState->scrollX = GetScrollX();
 	scrollState->scrollRegionY = ImMax(0.0f, GetWindowHeight() - scrollbarSize);
@@ -180,8 +197,8 @@ bool ImGui::InputTextMultilineScrolling(const char *label, char *buf, size_t buf
 	int oldCursorPos = scrollState->oldCursorPos;
 
 	PushItemWidth(textBoxWidth);
-	bool changed = InputTextMultiline(label, buf, buf_size, ImVec2(textBoxWidth, textBoxHeight),
-	                                  flags | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_NoHorizontalScroll, Imgui_Core_InputTextMultilineScrollingCallback, scrollState);
+	bool changed = InputTextEx(label, nullptr, buf, (int)buf_size, ImVec2(textBoxWidth, textBoxHeight),
+	                           flags | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_NoHorizontalScroll, Imgui_Core_InputTextMultilineScrollingCallback, scrollState);
 	PopItemWidth();
 	if(IsItemActive() && Imgui_Core_HasFocus()) {
 		Imgui_Core_RequestRender();
@@ -228,12 +245,32 @@ bool ImGui::InputTextMultilineScrolling(const char *label, char *buf, size_t buf
 	return changed;
 }
 
+bool ImGui::InputTextMultilineScrolling(const char *label, char *buf, size_t buf_size, const ImVec2 &size, ImGuiInputTextFlags flags)
+{
+	return InputTextScrollingEx(label, buf, buf_size, size, flags | ImGuiInputTextFlags_Multiline);
+}
+
 bool ImGui::InputTextMultilineScrolling(const char *label, sb_t *sb, u32 buf_size, const ImVec2 &size, ImGuiInputTextFlags flags)
 {
 	if(sb->allocated < buf_size) {
 		sb_reserve(sb, buf_size);
 	}
-	bool ret = InputTextMultilineScrolling(label, (char *)sb->data, sb->allocated, size, flags);
+	bool ret = InputTextScrollingEx(label, (char *)sb->data, sb->allocated, size, flags | ImGuiInputTextFlags_Multiline);
+	sb->count = sb->data ? (u32)strlen(sb->data) + 1 : 0;
+	return ret;
+}
+
+bool ImGui::InputTextScrolling(const char *label, char *buf, size_t buf_size, ImGuiInputTextFlags flags)
+{
+	return InputTextScrollingEx(label, buf, buf_size, ImVec2(0.0f, 0.0f), flags);
+}
+
+bool ImGui::InputTextScrolling(const char *label, sb_t *sb, u32 buf_size, ImGuiInputTextFlags flags)
+{
+	if(sb->allocated < buf_size) {
+		sb_reserve(sb, buf_size);
+	}
+	bool ret = InputTextScrollingEx(label, (char *)sb->data, sb->allocated, ImVec2(0.0f, 0.0f), flags);
 	sb->count = sb->data ? (u32)strlen(sb->data) + 1 : 0;
 	return ret;
 }

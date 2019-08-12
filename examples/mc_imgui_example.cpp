@@ -113,7 +113,8 @@ static void MC_Imgui_Example_Image(void)
 	}
 }
 
-static char s_inputBuffer[8192];
+static char s_inputBufferMulti[8192];
+static char s_inputBufferSingle[8192];
 void MC_Imgui_Example_Update(void)
 {
 	MC_Imgui_Example_MainMenuBar();
@@ -132,8 +133,12 @@ void MC_Imgui_Example_Update(void)
 			ImGui::SetClipboardText("1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n-------------\n");
 		}
 
+		ImGui::PushItemWidth(1000.0f);
+		ImGui::InputTextScrolling("##InputTestSingle", s_inputBufferSingle, sizeof(s_inputBufferSingle), ImGuiInputTextFlags_None);
+		ImGui::PopItemWidth();
+
 		ImVec2 inputSize(1000.0f, 400.0f);
-		ImGui::InputTextMultilineScrolling("##InputTest", s_inputBuffer, sizeof(s_inputBuffer), inputSize, ImGuiInputTextFlags_None);
+		ImGui::InputTextMultilineScrolling("##InputTestMulti", s_inputBufferMulti, sizeof(s_inputBufferMulti), inputSize, ImGuiInputTextFlags_None);
 	}
 	ImGui::End();
 

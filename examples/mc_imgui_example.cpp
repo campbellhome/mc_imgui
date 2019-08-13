@@ -137,7 +137,7 @@ void MC_Imgui_Example_Update(void)
 		ImGui::InputTextScrolling("##InputTestSingle", s_inputBufferSingle, sizeof(s_inputBufferSingle), ImGuiInputTextFlags_None);
 		ImGui::PopItemWidth();
 
-		ImVec2 inputSize(1000.0f, 400.0f);
+		ImVec2 inputSize(1000.0f, -40.0f);
 		ImGui::InputTextMultilineScrolling("##InputTestMulti", s_inputBufferMulti, sizeof(s_inputBufferMulti), inputSize, ImGuiInputTextFlags_None);
 	}
 	ImGui::End();

@@ -147,6 +147,12 @@ static bool ImGui::InputTextScrollingEx(const char *label, char *buf, size_t buf
 		childWidth = -labelWidth;
 	}
 	float childHeight = size.y;
+	if(size.y < 0.0f) {
+		childHeight = availSize.y + size.y;
+	} else if(size.y == 0.0f && bMultiline) {
+		childHeight = 4.0f * GetTextLineHeightWithSpacing() + scrollbarSize;
+	}
+
 	float textBoxWidth = availSize.x - (bMultiline ? scrollbarSize : 0.0f);
 	if(textSize.x > textBoxWidth * 0.8f) {
 		textBoxWidth = textSize.x + textBoxWidth * 0.8f;

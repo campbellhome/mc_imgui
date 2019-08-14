@@ -23,6 +23,7 @@ void Imgui_Core_HideUnhideWindow(void);
 void Imgui_Core_HideWindow(void);
 void Imgui_Core_UnhideWindow(void);
 void Imgui_Core_BringWindowToFront(void);
+void Imgui_Core_SetDebugFocusChange(b32 bDebugFocusChange);
 
 void Imgui_Core_SetDpiScale(float dpiScale);
 float Imgui_Core_GetDpiScale(void);

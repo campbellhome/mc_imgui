@@ -55,6 +55,7 @@ static bool g_shuttingDown;
 static bool g_bDirtyWindowPlacement;
 static bool g_setCmdline;
 static bool g_bCloseHidesWindow;
+static bool g_bDebugFocusChange;
 static HWINEVENTHOOK s_hWinEventHook;
 
 static void CALLBACK Imgui_Core_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
@@ -145,6 +146,11 @@ extern "C" void Imgui_Core_SetCloseHidesWindow(b32 bCloseHidesWindow)
 	g_bCloseHidesWindow = bCloseHidesWindow;
 }
 
+extern "C" void Imgui_Core_SetDebugFocusChange(b32 bDebugFocusChange)
+{
+	g_bDebugFocusChange = bDebugFocusChange;
+}
+
 extern "C" void Imgui_Core_HideUnhideWindow(void)
 {
 	if(s_wnd.hwnd) {
@@ -185,13 +191,13 @@ extern "C" void Imgui_Core_UnhideWindow(void)
 extern "C" void Imgui_Core_BringWindowToFront(void)
 {
 	if(s_wnd.hwnd) {
-		if(!BringWindowToTop(s_wnd.hwnd)) {
+		if(!BringWindowToTop(s_wnd.hwnd) && g_bDebugFocusChange) {
 			system_error_to_log(GetLastError(), "Window", "BringWindowToTop");
 		}
-		if(!SetForegroundWindow(s_wnd.hwnd)) {
+		if(!SetForegroundWindow(s_wnd.hwnd) && g_bDebugFocusChange) {
 			system_error_to_log(GetLastError(), "Window", "SetForegroundWindow");
 		}
-		if(!SetFocus(s_wnd.hwnd)) {
+		if(!SetFocus(s_wnd.hwnd) && g_bDebugFocusChange) {
 			system_error_to_log(GetLastError(), "Window", "SetFocus");
 		}
 		Imgui_Core_RequestRender();

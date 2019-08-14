@@ -137,21 +137,23 @@ static bool ImGui::InputTextScrollingEx(const char *label, char *buf, size_t buf
 	} else {
 		availSize.x = CalcItemWidth();
 	}
+
 	if(size.y > 0.0f) {
 		availSize.y = size.y;
 	} else if(size.y < 0.0f) {
 		availSize.y += size.y;
+	} else if(size.y == 0.0f) {
+		if(bMultiline) {
+			availSize.y = 4.0f * GetTextLineHeightWithSpacing() + scrollbarSize;
+		} else {
+			availSize.y = GetTextLineHeightWithSpacing();
+		}
 	}
 	float childWidth = availSize.x;
 	if(labelWidth > 0.0f) {
 		childWidth = -labelWidth;
 	}
-	float childHeight = size.y;
-	if(size.y < 0.0f) {
-		childHeight = availSize.y + size.y;
-	} else if(size.y == 0.0f && bMultiline) {
-		childHeight = 4.0f * GetTextLineHeightWithSpacing() + scrollbarSize;
-	}
+	float childHeight = availSize.y;
 
 	float textBoxWidth = availSize.x - (bMultiline ? scrollbarSize : 0.0f);
 	if(textSize.x > textBoxWidth * 0.8f) {

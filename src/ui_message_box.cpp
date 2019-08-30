@@ -9,6 +9,13 @@
 #include "message_box.h"
 #include "va.h"
 
+// warning C4820 : 'StructName' : '4' bytes padding added after data member 'MemberName'
+// warning C4365: '=': conversion from 'ImGuiTabItemFlags' to 'ImGuiID', signed/unsigned mismatch
+BB_WARNING_PUSH(4820, 4365)
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui_internal.h"
+BB_WARNING_POP
+
 static int s_activeFrames;
 
 bool UIMessageBox_Draw(messageBox *mb)
@@ -75,7 +82,11 @@ void UIMessageBox_Update()
 		title = "Untitled";
 	}
 
-	int flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize;
+	ImGuiViewport *viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos + viewport->Size * 0.5f, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	int flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
 	if(!ImGui::BeginPopupModal(title, nullptr, flags)) {
 		s_activeFrames = 0;
 		ImGui::OpenPopup(title);

@@ -15,6 +15,7 @@
 #include "system_error_utils.h"
 #include "time_utils.h"
 #include "ui_message_box.h"
+#include "va.h"
 #include "wrap_imgui.h"
 #include "wrap_shellscalingapi.h"
 
@@ -37,6 +38,8 @@ static HRESULT SetProcessDpiAwarenessShim(_In_ PROCESS_DPI_AWARENESS value)
 typedef struct tag_Imgui_Core_Window {
 	HWND hwnd;
 	LPDIRECT3DDEVICE9 pd3dDevice;
+	HRESULT last3DResetResult;
+	b32 b3dValid;
 } Imgui_Core_Window;
 
 static LPDIRECT3D9 s_pD3D;
@@ -59,6 +62,58 @@ static bool g_bDebugFocusChange;
 static HWINEVENTHOOK s_hWinEventHook;
 
 static void CALLBACK Imgui_Core_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+
+static const char *D3DErrorString(HRESULT Hr)
+{
+#define D3D_CASE(x) \
+	case x: return #x
+	switch(Hr) {
+		D3D_CASE(D3D_OK);
+
+		D3D_CASE(D3DERR_WRONGTEXTUREFORMAT);
+		D3D_CASE(D3DERR_UNSUPPORTEDCOLOROPERATION);
+		D3D_CASE(D3DERR_UNSUPPORTEDCOLORARG);
+		D3D_CASE(D3DERR_UNSUPPORTEDALPHAOPERATION);
+		D3D_CASE(D3DERR_UNSUPPORTEDALPHAARG);
+		D3D_CASE(D3DERR_TOOMANYOPERATIONS);
+		D3D_CASE(D3DERR_CONFLICTINGTEXTUREFILTER);
+		D3D_CASE(D3DERR_UNSUPPORTEDFACTORVALUE);
+		D3D_CASE(D3DERR_CONFLICTINGRENDERSTATE);
+		D3D_CASE(D3DERR_UNSUPPORTEDTEXTUREFILTER);
+		D3D_CASE(D3DERR_CONFLICTINGTEXTUREPALETTE);
+		D3D_CASE(D3DERR_DRIVERINTERNALERROR);
+
+		D3D_CASE(D3DERR_NOTFOUND);
+		D3D_CASE(D3DERR_MOREDATA);
+		D3D_CASE(D3DERR_DEVICELOST);
+		D3D_CASE(D3DERR_DEVICENOTRESET);
+		D3D_CASE(D3DERR_NOTAVAILABLE);
+		D3D_CASE(D3DERR_OUTOFVIDEOMEMORY);
+		D3D_CASE(D3DERR_INVALIDDEVICE);
+		D3D_CASE(D3DERR_INVALIDCALL);
+		D3D_CASE(D3DERR_DRIVERINVALIDCALL);
+		D3D_CASE(D3DERR_WASSTILLDRAWING);
+		D3D_CASE(D3DOK_NOAUTOGEN);
+
+#if !defined(D3D_DISABLE_9EX)
+		D3D_CASE(D3DERR_DEVICEREMOVED);
+		D3D_CASE(S_NOT_RESIDENT);
+		D3D_CASE(S_RESIDENT_IN_SHARED_MEMORY);
+		D3D_CASE(S_PRESENT_MODE_CHANGED);
+		D3D_CASE(S_PRESENT_OCCLUDED);
+		D3D_CASE(D3DERR_DEVICEHUNG);
+		D3D_CASE(D3DERR_UNSUPPORTEDOVERLAY);
+		D3D_CASE(D3DERR_UNSUPPORTEDOVERLAYFORMAT);
+		D3D_CASE(D3DERR_CANNOTPROTECTCONTENT);
+		D3D_CASE(D3DERR_UNSUPPORTEDCRYPTO);
+		D3D_CASE(D3DERR_PRESENT_STATISTICS_DISJOINT);
+#endif
+
+	default:
+		return va("Unknown (%8.8X)", Hr);
+	}
+#undef D3D_CASE
+}
 
 extern "C" b32 Imgui_Core_Init(const char *cmdline)
 {
@@ -98,12 +153,16 @@ void Imgui_Core_ResetD3D()
 		return;
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 	ImGui_Image_InvalidateDeviceObjects();
-#ifdef NDEBUG
-	s_wnd.pd3dDevice->Reset(&g_d3dpp);
-#else
 	HRESULT hr = s_wnd.pd3dDevice->Reset(&g_d3dpp);
-	IM_ASSERT(hr != D3DERR_INVALIDCALL);
-#endif
+	s_wnd.b3dValid = (hr == D3D_OK);
+	if(s_wnd.last3DResetResult != hr) {
+		s_wnd.last3DResetResult = hr;
+		if(s_wnd.b3dValid) {
+			BB_LOG("ImguiCore", "D3D Reset HR: %s", D3DErrorString(hr));
+		} else {
+			BB_WARNING("ImguiCore", "D3D Reset HR: %s", D3DErrorString(hr));
+		}
+	}
 	ImGui_ImplDX9_CreateDeviceObjects();
 }
 
@@ -448,6 +507,32 @@ typedef struct D3DCreateInfo_s {
 	DWORD vertexProcessingType;
 } D3DCreateInfo_t;
 
+static void Imgui_Core_InitD3D(void)
+{
+	D3DCreateInfo_t d3dCreateInfo[] = {
+		{ D3DDEVTYPE_HAL, D3DCREATE_MIXED_VERTEXPROCESSING },
+		{ D3DDEVTYPE_HAL, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
+		{ D3DDEVTYPE_SW, D3DCREATE_MIXED_VERTEXPROCESSING },
+		{ D3DDEVTYPE_SW, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
+	};
+	b32 bOk = false;
+	for(u32 i = 0; !bOk && i < BB_ARRAYSIZE(d3dCreateInfo); ++i) {
+		bOk = s_pD3D->CreateDevice(D3DADAPTER_DEFAULT, d3dCreateInfo[i].deviceType, s_wnd.hwnd, d3dCreateInfo[i].vertexProcessingType, &g_d3dpp, &s_wnd.pd3dDevice) >= 0;
+		if(bOk) {
+			BB_LOG("ImguiCore", "DeviceType: %d VertexProcessingType:%u", d3dCreateInfo[i].deviceType, d3dCreateInfo[i].vertexProcessingType);
+		}
+	}
+	if(bOk) {
+		ImGui_ImplWin32_Init(s_wnd.hwnd);
+		ImGui_Image_Init(s_wnd.pd3dDevice);
+		ImGui_ImplDX9_Init(s_wnd.pd3dDevice);
+		Fonts_InitFonts();
+		s_wnd.b3dValid = true;
+	} else {
+		s_wnd.pd3dDevice = nullptr;
+	}
+}
+
 extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp)
 {
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, Imgui_Core_WndProc, 0L, 0L, GetModuleHandle(NULL), icon, LoadCursor(NULL, IDC_ARROW), NULL, NULL, classname, NULL };
@@ -471,34 +556,17 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 		}
 		SetWindowPlacement(s_wnd.hwnd, &wp);
 	}
-	BB_LOG("Startup", "hwnd: %p", s_wnd.hwnd);
+	BB_LOG("ImguiCore", "hwnd: %p", s_wnd.hwnd);
 
 	if(s_wnd.hwnd) {
-		D3DCreateInfo_t d3dCreateInfo[] = {
-			{ D3DDEVTYPE_HAL, D3DCREATE_MIXED_VERTEXPROCESSING },
-			{ D3DDEVTYPE_HAL, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
-			{ D3DDEVTYPE_SW, D3DCREATE_MIXED_VERTEXPROCESSING },
-			{ D3DDEVTYPE_SW, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
-		};
-		b32 bOk = false;
-		for(u32 i = 0; !bOk && i < BB_ARRAYSIZE(d3dCreateInfo); ++i) {
-			bOk = s_pD3D->CreateDevice(D3DADAPTER_DEFAULT, d3dCreateInfo[i].deviceType, s_wnd.hwnd, d3dCreateInfo[i].vertexProcessingType, &g_d3dpp, &s_wnd.pd3dDevice) >= 0;
-		}
-		if(bOk) {
-			ImGui_ImplWin32_Init(s_wnd.hwnd);
-			ImGui_Image_Init(s_wnd.pd3dDevice);
-			ImGui_ImplDX9_Init(s_wnd.pd3dDevice);
-			Fonts_InitFonts();
-			if(wp.showCmd == SW_HIDE && !g_bCloseHidesWindow) {
-				ShowWindow(s_wnd.hwnd, SW_SHOWDEFAULT);
-			} else {
-				ShowWindow(s_wnd.hwnd, (int)wp.showCmd);
-			}
-			UpdateWindow(s_wnd.hwnd);
-			Time_StartNewFrame();
+		Imgui_Core_InitD3D();
+		if(wp.showCmd == SW_HIDE && !g_bCloseHidesWindow) {
+			ShowWindow(s_wnd.hwnd, SW_SHOWDEFAULT);
 		} else {
-			s_wnd.pd3dDevice = nullptr;
+			ShowWindow(s_wnd.hwnd, (int)wp.showCmd);
 		}
+		UpdateWindow(s_wnd.hwnd);
+		Time_StartNewFrame();
 	}
 
 	return s_wnd.hwnd;
@@ -542,6 +610,19 @@ b32 Imgui_Core_BeginFrame(void)
 		}
 		return false;
 	}
+
+	if(s_wnd.hwnd && !s_wnd.pd3dDevice) {
+		Imgui_Core_InitD3D();
+		if(!s_wnd.b3dValid) {
+			BB_TICK();
+			return true;
+		}
+	}
+
+	if(!s_wnd.b3dValid) {
+		Imgui_Core_ResetD3D();
+	}
+
 	if(g_needUpdateDpiDependentResources) {
 		g_needUpdateDpiDependentResources = false;
 		UpdateDpiDependentResources();
@@ -600,7 +681,7 @@ void Imgui_Core_EndFrame(ImVec4 clear_col)
 	}
 
 	// ImGui Rendering
-	if(requestRender) {
+	if(requestRender && s_wnd.pd3dDevice && s_wnd.b3dValid) {
 		s_wnd.pd3dDevice->SetRenderState(D3DRS_ZENABLE, false);
 		s_wnd.pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 		s_wnd.pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);

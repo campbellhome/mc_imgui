@@ -519,7 +519,7 @@ static void Imgui_Core_InitD3D(void)
 	for(u32 i = 0; !bOk && i < BB_ARRAYSIZE(d3dCreateInfo); ++i) {
 		bOk = s_pD3D->CreateDevice(D3DADAPTER_DEFAULT, d3dCreateInfo[i].deviceType, s_wnd.hwnd, d3dCreateInfo[i].vertexProcessingType, &g_d3dpp, &s_wnd.pd3dDevice) >= 0;
 		if(bOk) {
-			BB_LOG("ImguiCore", "DeviceType: %d VertexProcessingType:%u", d3dCreateInfo[i].deviceType, d3dCreateInfo[i].vertexProcessingType);
+			BB_LOG("ImguiCore", "DeviceType: %d VertexProcessingType: %u", d3dCreateInfo[i].deviceType, d3dCreateInfo[i].vertexProcessingType);
 		}
 	}
 	if(bOk) {
@@ -615,7 +615,7 @@ b32 Imgui_Core_BeginFrame(void)
 		Imgui_Core_InitD3D();
 		if(!s_wnd.b3dValid) {
 			BB_TICK();
-			return true;
+			return false;
 		}
 	}
 

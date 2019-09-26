@@ -7,12 +7,14 @@
 
 #include "mc_imgui_structs_generated.h"
 #include "bb_array.h"
+#include "str.h"
 #include "va.h"
 
 #include "fonts.h"
 #include "sb.h"
 #include "sdict.h"
-#include "uuid_rfc4122\sysdep.h"
+
+#include <string.h>
 
 
 void fontConfig_reset(fontConfig_t *val)
@@ -49,22 +51,6 @@ fontConfigs_t fontConfigs_clone(const fontConfigs_t *src)
 			if(bba_add_noclear(dst, 1)) {
 				bba_last(dst) = fontConfig_clone(src->data + i);
 			}
-		}
-	}
-	return dst;
-}
-
-void uuid_node_reset(uuid_node_t *val)
-{
-	if(val) {
-	}
-}
-uuid_node_t uuid_node_clone(const uuid_node_t *src)
-{
-	uuid_node_t dst = { 0 };
-	if(src) {
-		for(u32 i = 0; i < BB_ARRAYSIZE(src->nodeID); ++i) {
-			dst.nodeID[i] = src->nodeID[i];
 		}
 	}
 	return dst;

@@ -13,7 +13,6 @@
 #include "fonts.h"
 #include "sb.h"
 #include "sdict.h"
-#include "uuid_rfc4122\sysdep.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -47,21 +46,6 @@ fontConfigs_t json_deserialize_fontConfigs_t(JSON_Value *src)
 	return dst;
 }
 
-uuid_node_t json_deserialize_uuid_node_t(JSON_Value *src)
-{
-	uuid_node_t dst;
-	memset(&dst, 0, sizeof(dst));
-	if(src) {
-		JSON_Object *obj = json_value_get_object(src);
-		if(obj) {
-			for(u32 i = 0; i < BB_ARRAYSIZE(dst.nodeID); ++i) {
-				dst.nodeID[i] = (char)json_object_get_number(obj, va("nodeID.%u", i));
-			}
-		}
-	}
-	return dst;
-}
-
 //////////////////////////////////////////////////////////////////////////
 
 JSON_Value *json_serialize_fontConfig_t(const fontConfig_t *src)
@@ -86,18 +70,6 @@ JSON_Value *json_serialize_fontConfigs_t(const fontConfigs_t *src)
 			if(child) {
 				json_array_append_value(arr, child);
 			}
-		}
-	}
-	return val;
-}
-
-JSON_Value *json_serialize_uuid_node_t(const uuid_node_t *src)
-{
-	JSON_Value *val = json_value_init_object();
-	JSON_Object *obj = json_value_get_object(val);
-	if(obj) {
-		for(u32 i = 0; i < BB_ARRAYSIZE(src->nodeID); ++i) {
-			json_object_set_number(obj, va("nodeID.%u", i), src->nodeID[i]);
 		}
 	}
 	return val;

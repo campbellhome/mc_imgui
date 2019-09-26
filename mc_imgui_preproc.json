@@ -1,0 +1,16 @@
+{
+	"input": {
+		"checkFonts": true,
+		"sourceDirs": [
+			{ "dir": "include" }
+		],
+		"includeDirs": [
+			{ "dir": "submodules/mc_common/include" }
+		]
+	},
+	"output": {
+		"prefix": "mc_imgui_",
+		"sourceDir": "src",
+		"includeDir": "include"
+	}
+}

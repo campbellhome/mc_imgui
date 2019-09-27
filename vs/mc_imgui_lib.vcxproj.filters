@@ -141,5 +141,6 @@
     <None Include="..\src\forkawesome-webfont.inc">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\mc_imgui_preproc.json" />
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
 
 // clang-format off
 
-#include "include/mc_imgui_structs_generated.h"
+#include "mc_imgui_structs_generated.h"
 #include "bb_array.h"
 #include "str.h"
 #include "va.h"

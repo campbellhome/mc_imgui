@@ -5,7 +5,7 @@
 
 // clang-format off
 
-#include "include/mc_imgui_json_generated.h"
+#include "mc_imgui_json_generated.h"
 #include "bb_array.h"
 #include "json_utils.h"
 #include "va.h"

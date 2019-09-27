@@ -11,6 +11,7 @@
 	"output": {
 		"prefix": "mc_imgui_",
 		"sourceDir": "src",
-		"includeDir": "include"
+		"includeDir": "include",
+		"baseDir": "include"
 	}
 }

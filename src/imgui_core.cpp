@@ -263,6 +263,17 @@ extern "C" void Imgui_Core_BringWindowToFront(void)
 	}
 }
 
+extern "C" void Imgui_Core_FlashWindow(b32 bFlash)
+{
+	if(s_wnd.hwnd) {
+		FLASHWINFO info = { BB_EMPTY_INITIALIZER };
+		info.cbSize = sizeof(FLASHWINFO);
+		info.hwnd = s_wnd.hwnd;
+		info.dwFlags = bFlash ? (FLASHW_ALL | FLASHW_TIMERNOFG) : 0u;
+		FlashWindowEx(&info);
+	}
+}
+
 extern "C" void Imgui_Core_SetDpiScale(float dpiScale)
 {
 	if(g_dpiScale != dpiScale) {

@@ -95,6 +95,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\app_update.h" />
     <ClInclude Include="..\include\fonts.h" />
     <ClInclude Include="..\include\forkawesome-webfont.h" />
     <ClInclude Include="..\include\imgui_core.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="..\submodules\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\app_update.c" />
     <ClCompile Include="..\src\fonts.cpp" />
     <ClCompile Include="..\src\imgui_core.cpp" />
     <ClCompile Include="..\src\imgui_image.cpp" />

@@ -49,6 +49,9 @@
     <ClCompile Include="..\src\imgui_input_text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\app_update.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\submodules\imgui\imconfig.h">
@@ -115,6 +118,9 @@
       <Filter>stb</Filter>
     </ClInclude>
     <ClInclude Include="..\include\imgui_input_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\app_update.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

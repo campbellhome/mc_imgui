@@ -2,6 +2,8 @@
 // MIT license (see License.txt)
 
 #include "imgui_core.h"
+#include "app_update.h"
+#include "bb_string.h"
 #include "bb_time.h"
 #include "cmdline.h"
 #include "common.h"
@@ -340,6 +342,55 @@ extern "C" const char *Imgui_Core_GetColorScheme(void)
 	return sb_get(&g_colorscheme);
 }
 
+extern "C" void Update_Menu(void)
+{
+	if(ImGui::BeginMenu("Update")) {
+		updateManifest_t *manifest = Update_GetManifest();
+		auto AnnotateVersion = [manifest](const char *version) {
+			const char *annotated = version;
+			if(version && !bb_stricmp(version, sb_get(&manifest->stable))) {
+				annotated = va("%s (stable)", version);
+			} else if(version && !bb_stricmp(version, sb_get(&manifest->latest))) {
+				annotated = va("%s (latest)", version);
+			}
+			return annotated;
+		};
+		const char *currentVersion = Update_GetCurrentVersion();
+		const char *currentVersionAnnotated = AnnotateVersion(currentVersion);
+		ImGui::MenuItem(va("version %s", *currentVersionAnnotated ? currentVersionAnnotated : "unknown"), nullptr, false, false);
+		if(ImGui::MenuItem("Check for updates")) {
+			Update_CheckForUpdates(false);
+		}
+		if(ImGui::BeginMenu("Set desired version")) {
+			if(ImGui::MenuItem("stable", nullptr, Update_IsDesiredVersion("stable"))) {
+				Update_SetDesiredVersion("stable");
+			}
+			if(ImGui::MenuItem("latest", nullptr, Update_IsDesiredVersion("latest"))) {
+				Update_SetDesiredVersion("latest");
+			}
+			for(u32 i = 0; i < (manifest ? manifest->versions.count : 0); ++i) {
+				updateVersion_t *version = manifest->versions.data + i;
+				const char *versionName = sb_get(&version->name);
+				if(ImGui::MenuItem(AnnotateVersion(versionName), nullptr, Update_IsDesiredVersion(versionName))) {
+					Update_SetDesiredVersion(versionName);
+				}
+			}
+			ImGui::EndMenu();
+		}
+		if(Update_GetData()->showUpdateManagement && *currentVersion && !Update_IsStableVersion(currentVersion)) {
+			if(ImGui::MenuItem(va("Promote %s to stable version", currentVersion))) {
+				Update_SetStableVersion(currentVersion);
+			}
+		}
+		if(g_updateIgnoredVersion) {
+			if(ImGui::MenuItem(va("Update to version %u and restart", g_updateIgnoredVersion))) {
+				Update_RestartAndUpdate(g_updateIgnoredVersion);
+			}
+		}
+		ImGui::EndMenu();
+	}
+}
+
 void UpdateDpiDependentResources()
 {
 	Fonts_InitFonts();
@@ -486,6 +537,11 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		if(userResult) {
 			return userResult;
 		}
+	}
+
+	LRESULT result = Update_HandleWindowMessage(hWnd, msg, wParam, lParam);
+	if(result) {
+		return result;
 	}
 
 	switch(msg) {

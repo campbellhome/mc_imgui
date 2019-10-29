@@ -148,7 +148,7 @@ void Update_Shutdown(void)
 			if(fileData_writeIfChanged(sb_get(&updaterTempPath), NULL, fileData)) {
 				//-source=D:\wsl\builds\appName\2\appName_2.zip -target=D:\bin\appName
 				sb_t command = { BB_EMPTY_INITIALIZER };
-				sb_t source = update_get_archive_name(s_updateData.manifestDir, update_resolve_version(&s_updateManifest, s_desiredVersionName.name.data));
+				sb_t source = update_get_archive_name(s_updateData.manifestDir, s_updateData.appName, update_resolve_version(&s_updateManifest, s_desiredVersionName.name.data));
 				char target[2048] = "";
 				GetCurrentDirectoryA(sizeof(target), target);
 
@@ -319,7 +319,7 @@ static void update_promote_messageBoxFunc(messageBox *mb, const char *action)
 	if(!strcmp(action, "Promote")) {
 		const char *versionName = sdict_find_safe(&mb->data, "version");
 		if(s_updateData.manifestDir && *s_updateData.manifestDir) {
-			updateManifest_t manifest = updateManifest_build(s_updateData.manifestDir);
+			updateManifest_t manifest = updateManifest_build(s_updateData.manifestDir, s_updateData.appName);
 			sb_append(&manifest.stable, versionName);
 
 			JSON_Value *val = json_serialize_updateManifest_t(&manifest);

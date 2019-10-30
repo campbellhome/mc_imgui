@@ -144,7 +144,7 @@ void Update_Shutdown(void)
 		fileData_t fileData = fileData_read(va("%supdater.exe", s_updateData.appName));
 		if(fileData.buffer && fileData.bufferSize) {
 			sb_t tempDir = env_resolve("%TEMP%");
-			sb_t updaterTempPath = env_resolve(va("%TEMP%\\%supdater.exe", s_updateData.appName));
+			sb_t updaterTempPath = env_resolve(va("%%TEMP%%\\%supdater.exe", s_updateData.appName));
 			if(fileData_writeIfChanged(sb_get(&updaterTempPath), NULL, fileData)) {
 				//-source=D:\wsl\builds\appName\2\appName_2.zip -target=D:\bin\appName
 				sb_t command = { BB_EMPTY_INITIALIZER };

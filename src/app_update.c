@@ -190,6 +190,7 @@ void Update_RestartAndUpdate(u32 version)
 {
 	BB_LOG("Update", "Update and restart for version %u", version);
 	Update_BroadcastMessage(g_updateShutdownMessage, version);
+	Imgui_Core_RequestShutDown();
 	g_bUpdateRestartRequested = true;
 }
 

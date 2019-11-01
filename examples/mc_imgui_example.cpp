@@ -9,7 +9,9 @@
 #include "imgui_image.h"
 #include "imgui_input_text.h"
 #include "message_box.h"
+#include "str.h"
 #include "tokenize.h"
+#include "va.h"
 
 static bool s_showImguiDemo;
 static bool s_showImguiAbout;
@@ -191,6 +193,11 @@ int CALLBACK WinMain(_In_ HINSTANCE /*Instance*/, _In_opt_ HINSTANCE /*PrevInsta
 				while(token.start) {
 					ImGui::TextUnformatted(token.start, token.end);
 					//BB_LOG("Tokens", "%.*s", token.end - token.start, token.start);
+
+					char *tmp = va("%.*s", token.end - token.start, token.start);
+					strunescape(tmp);
+					ImGui::TextUnformatted(tmp);
+
 					token = tokenize(&cursor, " ");
 				}
 

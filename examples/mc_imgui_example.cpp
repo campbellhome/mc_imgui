@@ -9,6 +9,7 @@
 #include "imgui_image.h"
 #include "imgui_input_text.h"
 #include "message_box.h"
+#include "tokenize.h"
 
 static bool s_showImguiDemo;
 static bool s_showImguiAbout;
@@ -182,6 +183,17 @@ int CALLBACK WinMain(_In_ HINSTANCE /*Instance*/, _In_opt_ HINSTANCE /*PrevInsta
 			}
 			if(Imgui_Core_BeginFrame()) {
 				MC_Imgui_Example_Update();
+
+				const char *testCommandLine = R"("-test \"_\\\" !" test2)";
+				ImGui::TextUnformatted(testCommandLine);
+				const char *cursor = testCommandLine;
+				span_t token = tokenize(&cursor, " ");
+				while(token.start) {
+					ImGui::TextUnformatted(token.start, token.end);
+					//BB_LOG("Tokens", "%.*s", token.end - token.start, token.start);
+					token = tokenize(&cursor, " ");
+				}
+
 				ImVec4 clear_col = ImColor(34, 35, 34);
 				Imgui_Core_EndFrame(clear_col);
 			}

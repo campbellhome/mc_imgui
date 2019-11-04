@@ -13,6 +13,13 @@
 extern "C" {
 #endif
 
+struct sb_s;
+struct sbs_s;
+struct sdictEntry_s;
+struct sdict_s;
+struct fontConfig_s;
+struct fontConfigs_s;
+
 typedef struct sb_s sb_t;
 typedef struct sbs_s sbs_t;
 typedef struct sdictEntry_s sdictEntry_t;

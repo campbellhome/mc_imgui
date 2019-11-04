@@ -13,6 +13,13 @@
 extern "C" {
 #endif
 
+struct sb_s;
+struct sbs_s;
+struct sdictEntry_s;
+struct sdict_s;
+struct fontConfig_s;
+struct fontConfigs_s;
+
 typedef struct sb_s sb_t;
 typedef struct sbs_s sbs_t;
 typedef struct sdictEntry_s sdictEntry_t;
@@ -27,12 +34,24 @@ void sdict_reset(sdict_t *val);
 void fontConfig_reset(fontConfig_t *val);
 void fontConfigs_reset(fontConfigs_t *val);
 
+#if !defined(__cplusplus) || defined(DECLARE_sb_clone)
 sb_t sb_clone_from_loc(const char *file, int line, const sb_t *src);
+#endif
+#if !defined(__cplusplus) || defined(DECLARE_sbs_clone)
 sbs_t sbs_clone_from_loc(const char *file, int line, const sbs_t *src);
+#endif
+#if !defined(__cplusplus) || defined(DECLARE_sdictEntry_clone)
 sdictEntry_t sdictEntry_clone(const sdictEntry_t *src);
+#endif
+#if !defined(__cplusplus) || defined(DECLARE_sdict_clone)
 sdict_t sdict_clone(const sdict_t *src);
+#endif
+#if !defined(__cplusplus) || defined(DECLARE_fontConfig_clone)
 fontConfig_t fontConfig_clone(const fontConfig_t *src);
+#endif
+#if !defined(__cplusplus) || defined(DECLARE_fontConfigs_clone)
 fontConfigs_t fontConfigs_clone(const fontConfigs_t *src);
+#endif
 
 #if defined(__cplusplus)
 } // extern "C"

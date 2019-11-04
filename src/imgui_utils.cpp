@@ -43,6 +43,15 @@ namespace ImGui
 		return ret;
 	}
 
+	bool Selectable(const char *label, b32 *p_selected, ImGuiSelectableFlags flags, const ImVec2 &size_arg)
+	{
+		if(Selectable(label, *p_selected, flags, size_arg)) {
+			*p_selected = !*p_selected;
+			return true;
+		}
+		return false;
+	}
+
 	bool TreeNodeEx(const char *label, ImGuiTreeNodeFlags flags, b32 *v, void *ptr_id)
 	{
 		bool b = *v != 0;

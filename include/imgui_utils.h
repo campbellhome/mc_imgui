@@ -21,6 +21,7 @@ namespace ImGui
 	void PushStyleColor(ImGuiCol idx, const ImColor &col);
 	bool Checkbox(const char *label, b8 *v);
 	bool Checkbox(const char *label, b32 *v);
+	bool Selectable(const char *label, b32 *p_selected, ImGuiSelectableFlags flags = 0, const ImVec2 &size = ImVec2(0, 0));
 	bool TreeNodeEx(const char *label, ImGuiTreeNodeFlags flags, b32 *v, void *ptr_id = nullptr);
 	bool MenuItem(const char *label, const char *shortcut, b32 *p_selected, bool enabled = true);
 	bool Begin(const char *name, b32 *p_open, ImGuiWindowFlags flags = 0);

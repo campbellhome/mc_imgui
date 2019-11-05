@@ -108,6 +108,7 @@
     <ClInclude Include="..\include\mc_imgui_structs_generated.h" />
     <ClInclude Include="..\include\ui_message_box.h" />
     <ClInclude Include="..\include\wrap_imgui.h" />
+    <ClInclude Include="..\include\wrap_imgui_internal.h" />
     <ClInclude Include="..\include\wrap_shellscalingapi.h" />
     <ClInclude Include="..\submodules\imgui\examples\imgui_impl_dx9.h" />
     <ClInclude Include="..\submodules\imgui\examples\imgui_impl_win32.h" />

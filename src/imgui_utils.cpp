@@ -519,6 +519,26 @@ namespace ImGui
 		TextUnformatted(text);
 	}
 
+	void DrawStrikethrough(const char *text, ImColor color, ImVec2 pos)
+	{
+		ImFont *font = GetFont();
+		float fontSize = GetFontSize();
+
+		float barHeight = 2 * Imgui_Core_GetDpiScale();
+
+		ImVec2 size = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, text);
+		float lineHeight = GetTextLineHeightWithSpacing();
+		float deltaY = lineHeight - size.y;
+		pos.y += deltaY + 1 + 0.5f * (lineHeight - barHeight);
+
+		ImVec2 start = pos;
+		ImVec2 end = pos;
+		end.x += size.x;
+
+		ImDrawList *drawList = GetWindowDrawList();
+		drawList->AddLine(start, end, color, barHeight);
+	}
+
 	bool SelectableWithBackground(const char *label, bool selected, const ImColor bgColor, ImGuiSelectableFlags flags, const ImVec2 &size_arg)
 	{
 		ImGuiWindow *window = GetCurrentWindow();

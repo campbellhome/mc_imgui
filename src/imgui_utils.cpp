@@ -94,6 +94,20 @@ namespace ImGui
 		return IsKeyPressed(GetKeyIndex(key), repeat);
 	}
 
+	bool IsCurrentWindowNavWindowRoot(void)
+	{
+		ImGuiContext &g = *GImGui;
+		ImGuiWindow *window = GetCurrentWindow();
+		return (g.NavWindow && window && (window == g.NavWindow || window == g.NavWindow->ParentWindow));
+	}
+
+	bool IsCurrentWindowNavWindow(void)
+	{
+		ImGuiContext &g = *GImGui;
+		ImGuiWindow *window = GetCurrentWindow();
+		return (window && window == g.NavWindow);
+	}
+
 	bool IsCurrentWindowMoving(void)
 	{
 		return GetCurrentContext()->MovingWindow == GetCurrentWindow();

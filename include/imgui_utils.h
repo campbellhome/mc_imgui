@@ -26,6 +26,8 @@ namespace ImGui
 	bool MenuItem(const char *label, const char *shortcut, b32 *p_selected, bool enabled = true);
 	bool Begin(const char *name, b32 *p_open, ImGuiWindowFlags flags = 0);
 	bool IsKeyPressed(ImGuiKey_ key, bool repeat = true);
+	bool IsCurrentWindowNavWindowRoot(void);
+	bool IsCurrentWindowNavWindow(void);
 	bool IsCurrentWindowMoving(void);
 	bool IsAnyWindowMoving(void);
 	bool InputText(const char *label, sb_t *buf, u32 buf_size, ImGuiInputTextFlags flags = 0, ImGuiTextEditCallback callback = NULL, void *user_data = NULL);

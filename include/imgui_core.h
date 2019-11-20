@@ -22,6 +22,7 @@ void Imgui_Core_SetCloseHidesWindow(b32 bCloseHidesWindow);
 void Imgui_Core_HideUnhideWindow(void);
 void Imgui_Core_HideWindow(void);
 void Imgui_Core_UnhideWindow(void);
+void Imgui_Core_MinimizeWindow(void);
 void Imgui_Core_BringWindowToFront(void);
 void Imgui_Core_FlashWindow(b32 bFlash);
 void Imgui_Core_SetDebugFocusChange(b32 bDebugFocusChange);

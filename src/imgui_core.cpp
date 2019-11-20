@@ -249,6 +249,13 @@ extern "C" void Imgui_Core_UnhideWindow(void)
 	}
 }
 
+extern "C" void Imgui_Core_MinimizeWindow(void)
+{
+	if(s_wnd.hwnd) {
+		ShowWindow(s_wnd.hwnd, SW_MINIMIZE);
+	}
+}
+
 extern "C" void Imgui_Core_BringWindowToFront(void)
 {
 	if(s_wnd.hwnd) {

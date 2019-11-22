@@ -5,7 +5,7 @@
 
 #if BB_USING(BB_PLATFORM_WINDOWS)
 
-#define FEATURE_FREETYPE BB_ON
+#include "imgui_core_freetype.h"
 
 // can't push/pop because these happen after initial compilation phase:
 BB_WARNING_DISABLE(4514) // unreferenced inline function has been removed

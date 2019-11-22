@@ -146,6 +146,9 @@ extern "C" b32 Imgui_Core_Init(const char *cmdline)
 		cmdline_init_composite(cmdline);
 	}
 
+	Imgui_Core_Freetype_Init();
+	Fonts_Init();
+
 	return s_pD3D != nullptr;
 }
 
@@ -172,6 +175,7 @@ extern "C" void Imgui_Core_Shutdown(void)
 {
 	ImGui::InputTextShutdown();
 	Fonts_Shutdown();
+	Imgui_Core_Freetype_Shutdown();
 	mb_shutdown();
 
 	if(s_hWinEventHook) {

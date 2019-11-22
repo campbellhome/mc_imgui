@@ -35,6 +35,7 @@ void Fonts_CacheGlyphs(const char *text);
 
 sb_t Fonts_GetSystemFontDir(void);
 
+void Fonts_Init(void);
 void Fonts_Shutdown(void);
 
 #if defined(__cplusplus)

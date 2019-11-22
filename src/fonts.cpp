@@ -21,6 +21,8 @@ extern "C" void fontConfigs_reset(fontConfigs_t *val);
 
 static fontConfigs_t s_fontConfigs;
 
+#include "forkawesome-webfont.inc"
+
 #if BB_USING(FEATURE_FREETYPE)
 
 // warning C4548: expression before comma has no effect; expected expression with side-effect
@@ -32,10 +34,6 @@ static fontConfigs_t s_fontConfigs;
 BB_WARNING_PUSH(4820 4255 4668 4574 4365)
 #include "misc/freetype/imgui_freetype.cpp"
 BB_WARNING_POP
-
-#include "forkawesome-webfont.inc"
-
-#pragma comment(lib, "freetype.lib")
 
 #endif // #if BB_USING(FEATURE_FREETYPE)
 
@@ -59,7 +57,7 @@ struct fontBuilder {
 			return false;
 		ImGuiIO &io = ImGui::GetIO();
 #if BB_USING(FEATURE_FREETYPE)
-		if(useFreeType) {
+		if(useFreeType && Imgui_Core_Freetype_Valid()) {
 			ImGuiFreeType::BuildFontAtlas(io.Fonts, 0);
 		} else
 #endif // #if BB_USING(FEATURE_FREETYPE)
@@ -86,8 +84,10 @@ void Fonts_Menu(void)
 {
 //ImGui::Checkbox("DEBUG Text Shadows", &g_config.textShadows);
 #if BB_USING(FEATURE_FREETYPE)
-	if(ImGui::Checkbox("DEBUG Use FreeType", &s_fonts.useFreeType)) {
-		Fonts_MarkAtlasForRebuild();
+	if(Imgui_Core_Freetype_Valid()) {
+		if(ImGui::Checkbox("DEBUG Use FreeType", &s_fonts.useFreeType)) {
+			Fonts_MarkAtlasForRebuild();
+		}
 	}
 #endif // #if BB_USING(FEATURE_FREETYPE)
 }
@@ -151,6 +151,13 @@ extern "C" void Fonts_AddFont(fontConfig_t font)
 	bba_push(s_fontConfigs, fontConfig_clone(&font));
 	Imgui_Core_QueueUpdateDpiDependentResources();
 	Imgui_Core_QueueUpdateDpiDependentResources();
+}
+
+void Fonts_Init(void)
+{
+#if BB_USING(FEATURE_FREETYPE)
+	s_fonts.useFreeType = Imgui_Core_Freetype_Valid();
+#endif
 }
 
 void Fonts_InitFonts(void)

@@ -52,6 +52,9 @@
     <ClCompile Include="..\src\app_update.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\imgui_core_freetype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\submodules\imgui\imconfig.h">
@@ -124,6 +127,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\wrap_imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imgui_core_freetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

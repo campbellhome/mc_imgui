@@ -44,7 +44,7 @@ static void MC_Imgui_Example_MainMenuBar(void)
 				sdict_add_raw(&mb.data, "title", "Config error");
 				sdict_add_raw(&mb.data, "text", "Failed to open config UI.\nThis is an example that doesn't have config save/load.");
 				sdict_add_raw(&mb.data, "button1", "Ok");
-				mb_queue(mb);
+				mb_queue(mb, nullptr);
 			}
 			ImGui::EndMenu();
 		}

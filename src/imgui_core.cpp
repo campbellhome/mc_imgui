@@ -176,7 +176,7 @@ extern "C" void Imgui_Core_Shutdown(void)
 	ImGui::InputTextShutdown();
 	Fonts_Shutdown();
 	Imgui_Core_Freetype_Shutdown();
-	mb_shutdown();
+	mb_shutdown(nullptr);
 
 	if(s_hWinEventHook) {
 		UnhookWinEvent(s_hWinEventHook);

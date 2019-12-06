@@ -225,7 +225,7 @@ static void Update_UpdateAvailableMessageBox(u32 version)
 	sdict_add_raw(&mb.data, "button1", "Update");
 	sdict_add_raw(&mb.data, "button2", "Ignore");
 	sdict_add_raw(&mb.data, "version", va("%u", version));
-	mb_queue(mb);
+	mb_queue(mb, NULL);
 	Imgui_Core_RequestRender();
 }
 
@@ -353,7 +353,7 @@ void Update_SetStableVersion(const char *versionName)
 	sdict_add_raw(&mb.data, "button1", "Promote");
 	sdict_add_raw(&mb.data, "button2", "Cancel");
 	sdict_add_raw(&mb.data, "version", versionName);
-	mb_queue(mb);
+	mb_queue(mb, NULL);
 	Imgui_Core_RequestRender();
 }
 

@@ -73,7 +73,7 @@ bool UIMessageBox_Draw(messageBox *mb)
 
 void UIMessageBox_Update()
 {
-	messageBox *mb = mb_get_active();
+	messageBox *mb = mb_get_active(nullptr);
 	if(!mb)
 		return;
 
@@ -94,7 +94,7 @@ void UIMessageBox_Update()
 			if(mb->callback) {
 				mb->callback(mb, "");
 			}
-			mb_remove_active();
+			mb_remove_active(nullptr);
 			return;
 		}
 	}
@@ -102,7 +102,7 @@ void UIMessageBox_Update()
 	++s_activeFrames;
 	if(!UIMessageBox_Draw(mb)) {
 		ImGui::CloseCurrentPopup();
-		mb_remove_active();
+		mb_remove_active(nullptr);
 	}
 
 	ImGui::EndPopup();

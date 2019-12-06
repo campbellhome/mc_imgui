@@ -3,4 +3,5 @@
 
 #pragma once
 
+void UIMessageBox_EnableUpdate(bool bEnabled);
 void UIMessageBox_Update();

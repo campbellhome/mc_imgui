@@ -17,6 +17,12 @@ BB_WARNING_PUSH(4820, 4365)
 BB_WARNING_POP
 
 static int s_activeFrames;
+static bool s_bEnabled;
+
+void UIMessageBox_EnableUpdate(bool bEnabled)
+{
+	s_bEnabled = bEnabled;
+}
 
 bool UIMessageBox_Draw(messageBox *mb)
 {
@@ -73,6 +79,9 @@ bool UIMessageBox_Draw(messageBox *mb)
 
 void UIMessageBox_Update()
 {
+	if(!s_bEnabled)
+		return;
+
 	messageBox *mb = mb_get_active(nullptr);
 	if(!mb)
 		return;

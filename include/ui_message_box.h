@@ -3,5 +3,14 @@
 
 #pragma once
 
-void UIMessageBox_EnableUpdate(bool bEnabled);
-void UIMessageBox_Update();
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+typedef struct tag_messageBoxes messageBoxes;
+
+#if defined(__cplusplus)
+}
+#endif
+
+float UIMessageBox_Update(messageBoxes *boxes);

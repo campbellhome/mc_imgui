@@ -734,7 +734,10 @@ b32 Imgui_Core_BeginFrame(void)
 
 void Imgui_Core_EndFrame(ImVec4 clear_col)
 {
-	UIMessageBox_Update();
+	messageBoxes *boxes = mb_get_queue();
+	if(!boxes->manualUpdate) {
+		UIMessageBox_Update(boxes);
+	}
 	ImGui::EndFrame();
 
 	ImGuiIO &io = ImGui::GetIO();

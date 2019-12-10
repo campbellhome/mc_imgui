@@ -17,14 +17,8 @@ BB_WARNING_PUSH(4820, 4365)
 BB_WARNING_POP
 
 static int s_activeFrames;
-static bool s_bEnabled;
 
-void UIMessageBox_EnableUpdate(bool bEnabled)
-{
-	s_bEnabled = bEnabled;
-}
-
-bool UIMessageBox_Draw(messageBox *mb)
+static bool UIMessageBox_DrawModal(messageBox *mb)
 {
 	sdict_t *sd = &mb->data;
 	const char *title = sdict_find(sd, "title");
@@ -77,12 +71,9 @@ bool UIMessageBox_Draw(messageBox *mb)
 	return true;
 }
 
-void UIMessageBox_Update()
+static void UIMessageBox_UpdateModal(messageBoxes *boxes)
 {
-	if(!s_bEnabled)
-		return;
-
-	messageBox *mb = mb_get_active(nullptr);
+	messageBox *mb = mb_get_active(boxes);
 	if(!mb)
 		return;
 
@@ -109,10 +100,103 @@ void UIMessageBox_Update()
 	}
 
 	++s_activeFrames;
-	if(!UIMessageBox_Draw(mb)) {
+	if(!UIMessageBox_DrawModal(mb)) {
 		ImGui::CloseCurrentPopup();
 		mb_remove_active(nullptr);
 	}
 
 	ImGui::EndPopup();
+	return;
+}
+
+float UIMessageBox_Update(messageBoxes *boxes)
+{
+	if(!boxes) {
+		boxes = mb_get_queue();
+	}
+
+	messageBox *mb = mb_get_active(boxes);
+	if(!mb)
+		return 0.0f;
+
+	if(boxes->modal) {
+		UIMessageBox_UpdateModal(boxes);
+		return 0.0f;
+	}
+
+	b32 bRemove = false;
+
+	ImVec2 region = ImGui::GetContentRegionAvail();
+	ImVec2 windowPos = ImGui::GetWindowPos();
+	ImVec2 cursorPos = ImGui::GetCursorPos();
+	ImVec2 size = region;
+	size.y = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y;
+	ImVec2 start = windowPos + cursorPos;
+	ImVec2 end = start + size;
+	ImDrawList *DrawList = ImGui::GetWindowDrawList();
+	DrawList->AddRectFilled(start, end, 0x22222222);
+
+	ImDrawVert *bottomLeft = &DrawList->VtxBuffer.back();
+	ImDrawVert *bottomRight = bottomLeft - 1;
+	ImDrawVert *topRight = bottomLeft - 2;
+	ImDrawVert *topLeft = bottomLeft - 3;
+
+	ImGui::BeginGroup();
+	ImGui::Spacing();
+	sdict_t *sd = &mb->data;
+	const char *title = sdict_find(&mb->data, "title");
+	if(title) {
+		ImGui::AlignFirstTextHeightToWidgets();
+		ImGui::Text(" [ %s ] ", title);
+		ImGui::SameLine();
+	}
+
+	const char *text = sdict_find(&mb->data, "text");
+	if(text) {
+		ImGui::TextWrapped(" %s ", text);
+		ImGui::SameLine();
+	}
+
+	ImVec2 curPos = ImGui::GetWindowPos() + ImGui::GetCursorPos();
+	if(curPos.x - start.x >= region.x - 120 * Imgui_Core_GetDpiScale()) {
+		ImGui::NewLine();
+	}
+
+	u32 buttonIndex = 0;
+	const char *button;
+	while((button = sdict_find(sd, va("button%u", ++buttonIndex))) != nullptr) {
+		if(buttonIndex > 1) {
+			ImGui::SameLine();
+		}
+		if(ImGui::Button(button, ImVec2(120 * Imgui_Core_GetDpiScale(), 0.0f))) {
+			if(mb->callback) {
+				mb->callback(mb, button);
+			}
+			bRemove = true;
+			break;
+		}
+	};
+
+	ImGui::Spacing();
+	ImGui::EndGroup();
+
+	// colors are ABGR
+	u32 colorLeft = boxes->bgColor[0];
+	u32 colorRight = boxes->bgColor[1];
+	if(colorLeft || colorRight) {
+		bottomLeft->col = colorLeft;
+		bottomRight->col = colorRight;
+		topRight->col = colorRight;
+		topLeft->col = colorLeft;
+	}
+
+	float endY = ImGui::GetWindowPos().y + ImGui::GetCursorPos().y;
+	bottomLeft->pos.y = endY - ImGui::GetStyle().ItemSpacing.y;
+	bottomRight->pos.y = endY - ImGui::GetStyle().ItemSpacing.y;
+
+	if(bRemove) {
+		mb_remove_active(boxes);
+	}
+
+	return endY - start.y;
 }

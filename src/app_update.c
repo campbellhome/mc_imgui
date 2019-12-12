@@ -247,7 +247,7 @@ static void Update_CheckVersions(b32 updateImmediately)
 
 void Update_Tick(void)
 {
-	if(s_updateData.updateCheckMs > 0 && s_lastUpdateCheckMs + s_updateData.updateCheckMs < bb_current_time_ms()) {
+	if(s_updateData.updateCheckMs > 0 && s_lastUpdateCheckMs + s_updateData.updateCheckMs < bb_current_time_ms() && mb_get_active(NULL) == NULL) {
 		Update_CheckForUpdates(false);
 	}
 }

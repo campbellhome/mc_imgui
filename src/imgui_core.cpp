@@ -24,6 +24,8 @@
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "xinput9_1_0.lib")
 
+static void Imgui_Core_InitD3D(void);
+
 static HRESULT SetProcessDpiAwarenessShim(_In_ PROCESS_DPI_AWARENESS value)
 {
 	HMODULE hModule = GetModuleHandleA("shcore.dll");
@@ -41,7 +43,9 @@ typedef struct tag_Imgui_Core_Window {
 	HWND hwnd;
 	LPDIRECT3DDEVICE9 pd3dDevice;
 	HRESULT last3DResetResult;
+	b32 b3dInitialized;
 	b32 b3dValid;
+	u8 pad[4];
 } Imgui_Core_Window;
 
 static LPDIRECT3D9 s_pD3D;
@@ -166,6 +170,20 @@ void Imgui_Core_ResetD3D()
 			BB_LOG("ImguiCore", "D3D Reset HR: %s", D3DErrorString(hr));
 		} else {
 			BB_WARNING("ImguiCore", "D3D Reset HR: %s", D3DErrorString(hr));
+
+			ImGuiPlatformIO &PlatformIO = ImGui::GetPlatformIO();
+			if(PlatformIO.Platform_DestroyWindow) {
+				ImGuiViewport *mainViewport = ImGui::GetMainViewport();
+				if(mainViewport) {
+					PlatformIO.Platform_DestroyWindow(mainViewport);
+				}
+			}
+
+			ImGui_ImplDX9_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			s_wnd.pd3dDevice = nullptr;
+
+			Imgui_Core_InitD3D();
 		}
 	}
 	ImGui_ImplDX9_CreateDeviceObjects();
@@ -587,6 +605,16 @@ typedef struct D3DCreateInfo_s {
 
 static void Imgui_Core_InitD3D(void)
 {
+	if(!s_wnd.pd3dDevice && s_wnd.hwnd && s_wnd.b3dInitialized) {
+		if(s_pD3D) {
+			s_pD3D->Release();
+			s_pD3D = nullptr;
+		}
+		s_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
+		if(!s_pD3D)
+			return;
+	}
+
 	D3DCreateInfo_t d3dCreateInfo[] = {
 		{ D3DDEVTYPE_HAL, D3DCREATE_MIXED_VERTEXPROCESSING },
 		{ D3DDEVTYPE_HAL, D3DCREATE_SOFTWARE_VERTEXPROCESSING },
@@ -609,6 +637,8 @@ static void Imgui_Core_InitD3D(void)
 	} else {
 		s_wnd.pd3dDevice = nullptr;
 	}
+
+	s_wnd.b3dInitialized = true;
 }
 
 extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp)
@@ -653,6 +683,14 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 extern "C" void Imgui_Core_ShutdownWindow(void)
 {
 	if(s_wnd.pd3dDevice) {
+		ImGuiPlatformIO &PlatformIO = ImGui::GetPlatformIO();
+		if(PlatformIO.Platform_DestroyWindow) {
+			ImGuiViewport *mainViewport = ImGui::GetMainViewport();
+			if(mainViewport) {
+				PlatformIO.Platform_DestroyWindow(mainViewport);
+			}
+		}
+
 		ImGui_ImplDX9_Shutdown();
 		ImGui_Image_Shutdown();
 		ImGui_ImplWin32_Shutdown();

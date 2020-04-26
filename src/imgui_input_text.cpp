@@ -76,7 +76,7 @@ static int Imgui_Core_CountLines(const char *buf, int cursorPos)
 	return lines;
 }
 
-static int Imgui_Core_InputTextMultilineScrollingCallback(ImGuiTextEditCallbackData *data)
+static int Imgui_Core_InputTextMultilineScrollingCallback(ImGuiInputTextCallbackData *data)
 {
 	MultilineScrollState *scrollState = (MultilineScrollState *)data->UserData;
 	if(scrollState->oldCursorPos != data->CursorPos) {

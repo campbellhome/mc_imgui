@@ -118,7 +118,7 @@ namespace ImGui
 		return GetCurrentContext()->MovingWindow != nullptr;
 	}
 
-	bool InputText(const char *label, sb_t *sb, u32 buf_size, ImGuiInputTextFlags flags, ImGuiTextEditCallback callback, void *user_data)
+	bool InputText(const char *label, sb_t *sb, u32 buf_size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void *user_data)
 	{
 		if(sb->allocated < buf_size) {
 			sb_reserve(sb, buf_size);
@@ -131,7 +131,7 @@ namespace ImGui
 		return ret;
 	}
 
-	bool InputTextMultiline(const char *label, sb_t *sb, u32 buf_size, const ImVec2 &size, ImGuiInputTextFlags flags, ImGuiTextEditCallback callback, void *user_data)
+	bool InputTextMultiline(const char *label, sb_t *sb, u32 buf_size, const ImVec2 &size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void *user_data)
 	{
 		if(sb->allocated < buf_size) {
 			sb_reserve(sb, buf_size);
@@ -358,7 +358,7 @@ namespace ImGui
 		float *width = h.columnWidths + columnIndex;
 		bool last = columnIndex + 1 == h.numColumns;
 		if(last) {
-			*width = GetContentRegionAvailWidth();
+			*width = GetContentRegionAvail().x;
 		} else if(*width <= 0.0f && sortable) {
 			*width = CalcTextSize(text).x + CalcTextSize(" " ICON_SORT_UP).x + GetStyle().ItemSpacing.x * 2.0f;
 		}

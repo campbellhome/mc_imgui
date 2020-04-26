@@ -92,9 +92,9 @@ void Fonts_Menu(void)
 #endif // #if BB_USING(FEATURE_FREETYPE)
 }
 
-static ImFontAtlas::GlyphRangesBuilder s_glyphs;
+static ImFontGlyphRangesBuilder s_glyphs;
 
-static bool Glyphs_CacheText(ImFontAtlas::GlyphRangesBuilder *glyphs, const char *text, const char *text_end = nullptr)
+static bool Glyphs_CacheText(ImFontGlyphRangesBuilder *glyphs, const char *text, const char *text_end = nullptr)
 {
 	bool result = false;
 	while(text_end ? (text < text_end) : *text) {

@@ -577,9 +577,9 @@ namespace ImGui
 		ImVec2 window_padding = window->WindowPadding;
 		float max_x = (flags & ImGuiSelectableFlags_SpanAllColumns) ? GetWindowContentRegionMax().x : GetContentRegionMax().x;
 		float w_draw = ImMax(label_size.x, window->Pos.x + max_x - window_padding.x - pos.x);
-		ImVec2 size_draw((size_arg.x != 0 && !(flags & ImGuiSelectableFlags_DrawFillAvailWidth)) ? size_arg.x : w_draw, size_arg.y != 0.0f ? size_arg.y : size.y);
+		ImVec2 size_draw((size_arg.x != 0 && !(flags & ImGuiSelectableFlags_SpanAvailWidth)) ? size_arg.x : w_draw, size_arg.y != 0.0f ? size_arg.y : size.y);
 		ImRect bb(pos, pos + size_draw);
-		if(size_arg.x == 0.0f || (flags & ImGuiSelectableFlags_DrawFillAvailWidth))
+		if(size_arg.x == 0.0f || (flags & ImGuiSelectableFlags_SpanAvailWidth))
 			bb.Max.x += window_padding.x;
 
 		// Selectables are tightly packed together so we extend the box to cover spacing between selectable.
@@ -610,10 +610,10 @@ namespace ImGui
 		// We use NoHoldingActiveID on menus so user can click and _hold_ on a menu then drag to browse child entries
 		ImGuiButtonFlags button_flags = 0;
 		if(flags & ImGuiSelectableFlags_NoHoldingActiveID)
-			button_flags |= ImGuiButtonFlags_NoHoldingActiveID;
-		if(flags & ImGuiSelectableFlags_PressedOnClick)
+			button_flags |= ImGuiButtonFlags_NoHoldingActiveId;
+		if(flags & ImGuiSelectableFlags_SelectOnClick)
 			button_flags |= ImGuiButtonFlags_PressedOnClick;
-		if(flags & ImGuiSelectableFlags_PressedOnRelease)
+		if(flags & ImGuiSelectableFlags_SelectOnRelease)
 			button_flags |= ImGuiButtonFlags_PressedOnRelease;
 		if(flags & ImGuiSelectableFlags_Disabled)
 			button_flags |= ImGuiButtonFlags_Disabled;
@@ -632,7 +632,7 @@ namespace ImGui
 		if(pressed || hovered)
 			if(!g.NavDisableMouseHover && g.NavWindow == window && g.NavLayer == window->DC.NavLayerCurrent) {
 				g.NavDisableHighlight = true;
-				SetNavID(id, window->DC.NavLayerCurrent);
+				SetNavID(id, window->DC.NavLayerCurrent, window->DC.NavFocusScopeIdCurrent);
 			}
 		if(pressed)
 			MarkItemEdited(id);

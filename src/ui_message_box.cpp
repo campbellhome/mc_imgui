@@ -146,7 +146,7 @@ float UIMessageBox_Update(messageBoxes *boxes)
 	sdict_t *sd = &mb->data;
 	const char *title = sdict_find(&mb->data, "title");
 	if(title) {
-		ImGui::AlignFirstTextHeightToWidgets();
+		ImGui::AlignTextToFramePadding();
 		ImGui::Text(" [ %s ] ", title);
 		ImGui::SameLine();
 	}

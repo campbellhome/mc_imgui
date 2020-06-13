@@ -49,7 +49,9 @@ namespace ImGui
 	void SelectableText(const char *label, const char *fmt, ...);
 	bool SelectableWithBackground(const char *label, bool selected, const ImColor bgColor, ImGuiSelectableFlags flags = 0, const ImVec2 &size_arg = ImVec2(0.0f, 0.0f));
 
+	void TextShadow(const char *text, bool bWrapped = false, bool bHideLabel = false);
 	void TextShadowed(const char *text);
+	void TextWrappedShadowed(const char *text);
 	void DrawStrikethrough(const char *text, ImColor color, ImVec2 pos);
 
 	enum buttonType_e {

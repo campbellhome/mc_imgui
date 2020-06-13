@@ -513,24 +513,42 @@ namespace ImGui
 		return textPos;
 	}
 
+	void TextShadow(const char *text, bool bWrapped, bool bHideLabel)
+	{
+		if(!Imgui_Core_GetTextShadows())
+			return;
+
+		const char *text_display_end = bHideLabel ? FindRenderedTextEnd(text, nullptr) : nullptr;
+
+		ImVec2 pos = GetIconPosForText();
+
+		ImFont *font = GetFont();
+		float fontSize = GetFontSize();
+
+		ImGuiWindow *window = GetCurrentWindow();
+		const float wrap_pos_x = window->DC.TextWrapPos;
+		const bool wrap_enabled = (wrap_pos_x >= 0.0f) && bWrapped;
+		const float wrap_width = wrap_enabled ? CalcWrapWidthForPos(window->DC.CursorPos, wrap_pos_x) : 0.0f;
+
+		ImVec2 size = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, text);
+		float lineHeight = GetTextLineHeightWithSpacing();
+		float deltaY = lineHeight - size.y;
+		pos.y += deltaY;
+
+		ImDrawList *drawList = GetWindowDrawList();
+		drawList->AddText(font, fontSize, ImVec2(pos.x + 1, pos.y + 1), ImColor(0, 0, 0), text, text_display_end, wrap_width);
+	}
+
 	void TextShadowed(const char *text)
 	{
-		if(Imgui_Core_GetTextShadows()) {
-			ImVec2 pos = GetIconPosForText();
-
-			ImFont *font = GetFont();
-			float fontSize = GetFontSize();
-
-			ImVec2 size = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, text);
-			float lineHeight = GetTextLineHeightWithSpacing();
-			float deltaY = lineHeight - size.y;
-			pos.y += deltaY;
-
-			ImDrawList *drawList = GetWindowDrawList();
-			drawList->AddText(font, fontSize, ImVec2(pos.x + 1, pos.y + 1), ImColor(0, 0, 0), text);
-		}
-
+		TextShadow(text);
 		TextUnformatted(text);
+	}
+
+	void TextWrappedShadowed(const char *text)
+	{
+		TextShadow(text, true, true);
+		TextWrapped("%s", text);
 	}
 
 	void DrawStrikethrough(const char *text, ImColor color, ImVec2 pos)

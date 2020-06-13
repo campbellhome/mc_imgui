@@ -49,6 +49,9 @@ void Style_Apply(const char *colorscheme)
 		ImGui::StyleColorsClassic();
 	} else if(!strcmp(colorscheme, "Light")) {
 		ImGui::StyleColorsLight();
+		s.ScrollbarSize = 18.0f * dpiScale;
+		s.ScrollbarRounding = 4.0f * dpiScale;
+		s.Colors[ImGuiCol_TitleBgActive] = s.Colors[ImGuiCol_TabActive];
 	} else if(!strcmp(colorscheme, "Windows")) {
 		StyleColorsWindows();
 	} else /*if(!strcmp(colorscheme, "Dark"))*/ {
@@ -75,7 +78,7 @@ void StyleColorsVSDark()
 // taken from https://github.com/ocornut/imgui/issues/707
 void StyleColorsWindows()
 {
-	ImGui::StyleColorsClassic();
+	ImGui::StyleColorsLight();
 	ImGuiStyle *style = &ImGui::GetStyle();
 	ImVec4 *colors = style->Colors;
 
@@ -114,6 +117,8 @@ void StyleColorsWindows()
 	ImVec4 active = ImVec4(0.00f, 0.47f, 0.84f, 1.00f);
 	ImVec4 hover = ImVec4(0.00f, 0.47f, 0.84f, 0.20f);
 
+	ImVec4 headerBlue = ImVec4(124 / 255.f, 188 / 255.f, 234 / 255.f, 1.00f);
+
 	colors[ImGuiCol_Text] = text;
 	colors[ImGuiCol_WindowBg] = background;
 	colors[ImGuiCol_ChildBg] = background;
@@ -131,7 +136,7 @@ void StyleColorsWindows()
 	colors[ImGuiCol_FrameBgActive] = active;
 
 	colors[ImGuiCol_MenuBarBg] = header;
-	colors[ImGuiCol_Header] = header;
+	colors[ImGuiCol_Header] = headerBlue;
 	colors[ImGuiCol_HeaderHovered] = hover;
 	colors[ImGuiCol_HeaderActive] = active;
 

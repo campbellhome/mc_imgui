@@ -17,6 +17,7 @@ BB_WARNING_POP
 namespace ImGui
 {
 	int s_tabCount;
+	ImColor s_shadowColor(0, 0, 0);
 
 	void PushStyleColor(ImGuiCol idx, const ImColor &col)
 	{
@@ -513,6 +514,11 @@ namespace ImGui
 		return textPos;
 	}
 
+	void SetTextShadowColor(ImColor shadowColor)
+	{
+		s_shadowColor = shadowColor;
+	}
+
 	void TextShadow(const char *text, bool bWrapped, bool bHideLabel)
 	{
 		if(!Imgui_Core_GetTextShadows())
@@ -536,7 +542,7 @@ namespace ImGui
 		pos.y += deltaY;
 
 		ImDrawList *drawList = GetWindowDrawList();
-		drawList->AddText(font, fontSize, ImVec2(pos.x + 1, pos.y + 1), ImColor(0, 0, 0), text, text_display_end, wrap_width);
+		drawList->AddText(font, fontSize, ImVec2(pos.x + 1, pos.y + 1), s_shadowColor, text, text_display_end, wrap_width);
 	}
 
 	void TextShadowed(const char *text)

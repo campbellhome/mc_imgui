@@ -226,12 +226,12 @@ extern "C" float Imgui_Core_GetDpiScale(void)
 
 extern "C" void Imgui_Core_SetCloseHidesWindow(b32 bCloseHidesWindow)
 {
-	g_bCloseHidesWindow = bCloseHidesWindow;
+	g_bCloseHidesWindow = bCloseHidesWindow != 0;
 }
 
 extern "C" void Imgui_Core_SetDebugFocusChange(b32 bDebugFocusChange)
 {
-	g_bDebugFocusChange = bDebugFocusChange;
+	g_bDebugFocusChange = bDebugFocusChange != 0;
 }
 
 extern "C" void Imgui_Core_HideUnhideWindow(void)
@@ -391,22 +391,22 @@ extern "C" void Update_Menu(void)
 			Update_CheckForUpdates(false);
 		}
 		if(ImGui::BeginMenu("Set desired version")) {
-			if(ImGui::MenuItem("stable", nullptr, Update_IsDesiredVersion("stable"))) {
+			if(ImGui::MenuItem("stable", nullptr, Update_IsDesiredVersion("stable") != 0)) {
 				Update_SetDesiredVersion("stable");
 			}
-			if(ImGui::MenuItem("latest", nullptr, Update_IsDesiredVersion("latest"))) {
+			if(ImGui::MenuItem("latest", nullptr, Update_IsDesiredVersion("latest") != 0)) {
 				Update_SetDesiredVersion("latest");
 			}
 			for(u32 i = 0; i < (manifest ? manifest->versions.count : 0); ++i) {
 				updateVersion_t *version = manifest->versions.data + i;
 				const char *versionName = sb_get(&version->name);
-				if(ImGui::MenuItem(AnnotateVersion(versionName), nullptr, Update_IsDesiredVersion(versionName))) {
+				if(ImGui::MenuItem(AnnotateVersion(versionName), nullptr, Update_IsDesiredVersion(versionName) != 0)) {
 					Update_SetDesiredVersion(versionName);
 				}
 			}
 			ImGui::EndMenu();
 		}
-		if(Update_GetData()->showUpdateManagement && *currentVersion && !Update_IsStableVersion(currentVersion)) {
+		if(Update_GetData()->showUpdateManagement && *currentVersion && !Update_IsStableVersion(currentVersion) != 0) {
 			if(ImGui::MenuItem(va("Promote %s to stable version", currentVersion))) {
 				Update_SetStableVersion(currentVersion);
 			}

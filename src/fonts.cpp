@@ -156,7 +156,7 @@ extern "C" void Fonts_AddFont(fontConfig_t font)
 void Fonts_Init(void)
 {
 #if BB_USING(FEATURE_FREETYPE)
-	s_fonts.useFreeType = Imgui_Core_Freetype_Valid();
+	s_fonts.useFreeType = Imgui_Core_Freetype_Valid() != 0;
 #endif
 }
 

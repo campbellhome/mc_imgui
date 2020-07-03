@@ -46,7 +46,7 @@ namespace ImGui
 
 	bool Selectable(const char *label, b32 *p_selected, ImGuiSelectableFlags flags, const ImVec2 &size_arg)
 	{
-		if(Selectable(label, *p_selected, flags, size_arg)) {
+		if(Selectable(label, *p_selected != 0, flags, size_arg)) {
 			*p_selected = !*p_selected;
 			return true;
 		}

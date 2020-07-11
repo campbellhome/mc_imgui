@@ -52,6 +52,7 @@ void Style_Apply(const char *colorscheme)
 		s.ScrollbarSize = 18.0f * dpiScale;
 		s.ScrollbarRounding = 4.0f * dpiScale;
 		s.Colors[ImGuiCol_TitleBgActive] = s.Colors[ImGuiCol_TabActive];
+		s.Colors[ImGuiCol_PopupBg] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
 	} else if(!strcmp(colorscheme, "Windows")) {
 		StyleColorsWindows();
 	} else /*if(!strcmp(colorscheme, "Dark"))*/ {

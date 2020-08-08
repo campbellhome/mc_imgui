@@ -103,7 +103,7 @@ static bool Glyphs_CacheText(ImFontGlyphRangesBuilder *glyphs, const char *text,
 		text += c_len;
 		if(c_len == 0)
 			break;
-		if(c < 0x10000) {
+		if(c <= IM_UNICODE_CODEPOINT_MAX) {
 			if(!glyphs->GetBit((ImWchar)c)) {
 				glyphs->SetBit((ImWchar)c);
 				result = true;

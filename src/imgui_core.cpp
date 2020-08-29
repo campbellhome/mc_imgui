@@ -641,9 +641,10 @@ static void Imgui_Core_InitD3D(void)
 	s_wnd.b3dInitialized = true;
 }
 
-extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp)
+extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, HICON icon, WINDOWPLACEMENT wp_)
 {
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, Imgui_Core_WndProc, 0L, 0L, GetModuleHandle(NULL), icon, LoadCursor(NULL, IDC_ARROW), NULL, NULL, classname, NULL };
+	WINDOWPLACEMENT wp = wp_;
 	s_wc = wc;
 	RegisterClassEx(&s_wc);
 
@@ -651,6 +652,7 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 	int y = 100;
 	int w = 1280;
 	int h = 800;
+	b32 startHidden = cmdline_find("-hide") > 0 && !g_bCloseHidesWindow;
 	if(wp.rcNormalPosition.right > wp.rcNormalPosition.left) {
 		x = wp.rcNormalPosition.left;
 		y = wp.rcNormalPosition.top;
@@ -662,7 +664,13 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 		if(wp.showCmd == SW_SHOWMINIMIZED) {
 			wp.showCmd = SW_SHOWNORMAL;
 		}
-		SetWindowPlacement(s_wnd.hwnd, &wp);
+		if(startHidden && wp.showCmd == SW_SHOWMAXIMIZED) {
+			wp.showCmd = SW_SHOWMINIMIZED;
+			wp.flags |= WPF_RESTORETOMAXIMIZED;
+		} else if(!startHidden) {
+			SetWindowPlacement(s_wnd.hwnd, &wp);
+		}
+		wp.showCmd = wp_.showCmd;
 	}
 	BB_LOG("ImguiCore", "hwnd: %p", s_wnd.hwnd);
 
@@ -671,7 +679,11 @@ extern "C" HWND Imgui_Core_InitWindow(const char *classname, const char *title, 
 		if(wp.showCmd == SW_HIDE && !g_bCloseHidesWindow) {
 			ShowWindow(s_wnd.hwnd, SW_SHOWDEFAULT);
 		} else {
-			ShowWindow(s_wnd.hwnd, (int)wp.showCmd);
+			if(startHidden) {
+				ShowWindow(s_wnd.hwnd, SW_HIDE);
+			} else {
+				ShowWindow(s_wnd.hwnd, (int)wp.showCmd);
+			}
 		}
 		UpdateWindow(s_wnd.hwnd);
 		Time_StartNewFrame();

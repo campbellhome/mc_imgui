@@ -31,7 +31,7 @@ static fontConfigs_t s_fontConfigs;
 // warning C4668: '_WIN32_WINNT_WINTHRESHOLD' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
 // warning C4574: 'INCL_WINSOCK_API_TYPEDEFS' is defined to be '0': did you mean to use '#if INCL_WINSOCK_API_TYPEDEFS'?
 // warning C4365: 'return': conversion from 'bool' to 'BOOLEAN', signed/unsigned mismatch
-BB_WARNING_PUSH(4820 4255 4668 4574 4365)
+BB_WARNING_PUSH(4820 4255 4668 4574 4365 4619 5219)
 #include "misc/freetype/imgui_freetype.cpp"
 BB_WARNING_POP
 
@@ -45,7 +45,7 @@ extern "C" void Fonts_Shutdown(void)
 struct fontBuilder {
 #if BB_USING(FEATURE_FREETYPE)
 	bool useFreeType = true;
-#else  // #if BB_USING(FEATURE_FREETYPE)
+#else // #if BB_USING(FEATURE_FREETYPE)
 	bool useFreeType = false;
 #endif // #else // #if BB_USING(FEATURE_FREETYPE)
 	bool rebuild = true;
@@ -177,8 +177,8 @@ void Fonts_InitFonts(void)
 		for(u32 i = 0; i < s_fontConfigs.count; ++i) {
 			fontConfig_t *fontConfig = s_fontConfigs.data + i;
 			if(fontConfig->enabled && fontConfig->size > 0 && *sb_get(&fontConfig->path)) {
-				io.Fonts->AddFontFromFileTTF(sb_get(&fontConfig->path), fontConfig->size * dpiScale, nullptr, glyphRanges.Data);
-				Fonts_MergeIconFont(fontConfig->size * dpiScale);
+				io.Fonts->AddFontFromFileTTF(sb_get(&fontConfig->path), (float)fontConfig->size * dpiScale, nullptr, glyphRanges.Data);
+				Fonts_MergeIconFont((float)fontConfig->size * dpiScale);
 			} else {
 				io.Fonts->AddFontDefault();
 				Fonts_MergeIconFont(12.0f);

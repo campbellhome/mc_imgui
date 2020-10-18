@@ -86,7 +86,7 @@ static int Imgui_Core_InputTextMultilineScrollingCallback(ImGuiInputTextCallback
 
 		ImVec2 lineSize = ImGui::CalcTextSize(buf + lineStartPos, buf + data->CursorPos);
 		float cursorX = lineSize.x;
-		float cursorY = lines * lineSize.y;
+		float cursorY = (float)lines * lineSize.y;
 		float scrollAmountX = scrollState->scrollRegionX * 0.25f;
 		float scrollAmountY = scrollState->scrollRegionY * 0.25f;
 

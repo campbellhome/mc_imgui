@@ -500,12 +500,12 @@ LRESULT WINAPI Imgui_Core_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_NCCREATE:
 		EnableNonClientDpiScalingShim(hWnd);
 		g_dpi = (int)GetDpiForWindowShim(hWnd);
-		g_dpiScale = g_dpi / (float)USER_DEFAULT_SCREEN_DPI;
+		g_dpiScale = (float)g_dpi / (float)USER_DEFAULT_SCREEN_DPI;
 		Style_Apply(sb_get(&g_colorscheme));
 		break;
 	case WM_DPICHANGED: {
 		g_dpi = HIWORD(wParam);
-		g_dpiScale = g_dpi / (float)USER_DEFAULT_SCREEN_DPI;
+		g_dpiScale = (float)g_dpi / (float)USER_DEFAULT_SCREEN_DPI;
 		UpdateDpiDependentResources();
 
 		RECT *const prcNewWindow = (RECT *)lParam;

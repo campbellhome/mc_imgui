@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "imgui_image.h"
 #include "bb_array.h"
-BB_WARNING_PUSH(4365 4820 4296)
+BB_WARNING_PUSH(4365 4820 4296 4619 5219)
 #include "stb/stb_image.h"
 BB_WARNING_POP
 #include <d3d9.h>
@@ -28,7 +28,7 @@ static u32 s_lastUserId;
 ImVec2 ImGui_Image_Constrain(const UserImageData &image, ImVec2 available)
 {
 	float availableRatio = available.x / available.y;
-	float imageRatio = image.width / (float)image.height;
+	float imageRatio = (float)image.width / (float)image.height;
 	if(availableRatio > imageRatio) {
 		// available space is wider, so we have extra space on the sides
 		return ImVec2(imageRatio * available.y, available.y);

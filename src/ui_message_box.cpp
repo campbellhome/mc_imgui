@@ -136,10 +136,7 @@ float UIMessageBox_Update(messageBoxes *boxes)
 	ImDrawList *DrawList = ImGui::GetWindowDrawList();
 	DrawList->AddRectFilled(start, end, 0x22222222);
 
-	ImDrawVert *bottomLeft = &DrawList->VtxBuffer.back();
-	ImDrawVert *bottomRight = bottomLeft - 1;
-	ImDrawVert *topRight = bottomLeft - 2;
-	ImDrawVert *topLeft = bottomLeft - 3;
+	int prevSize = DrawList->VtxBuffer.size();
 
 	ImGui::BeginGroup();
 	ImGui::Spacing();
@@ -179,6 +176,11 @@ float UIMessageBox_Update(messageBoxes *boxes)
 
 	ImGui::Spacing();
 	ImGui::EndGroup();
+
+	ImDrawVert* bottomLeft = &DrawList->VtxBuffer[prevSize - 1];
+	ImDrawVert* bottomRight = bottomLeft - 1;
+	ImDrawVert* topRight = bottomLeft - 2;
+	ImDrawVert* topLeft = bottomLeft - 3;
 
 	// colors are ABGR
 	u32 colorLeft = boxes->bgColor[0];

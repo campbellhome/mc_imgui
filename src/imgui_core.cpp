@@ -26,19 +26,6 @@
 
 static void Imgui_Core_InitD3D(void);
 
-static HRESULT SetProcessDpiAwarenessShim(_In_ PROCESS_DPI_AWARENESS value)
-{
-	HMODULE hModule = GetModuleHandleA("shcore.dll");
-	if(hModule) {
-		typedef HRESULT(WINAPI * Proc)(_In_ PROCESS_DPI_AWARENESS value);
-		Proc proc = (Proc)(void *)(GetProcAddress(hModule, "SetProcessDpiAwareness"));
-		if(proc) {
-			return proc(value);
-		}
-	}
-	return STG_E_UNIMPLEMENTEDFUNCTION;
-}
-
 typedef struct tag_Imgui_Core_Window {
 	HWND hwnd;
 	LPDIRECT3DDEVICE9 pd3dDevice;
@@ -127,7 +114,7 @@ extern "C" b32 Imgui_Core_Init(const char *cmdline)
 	ImGui::CreateContext();
 	Style_Init();
 
-	SetProcessDpiAwarenessShim(PROCESS_PER_MONITOR_DPI_AWARE);
+	SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
 	s_hWinEventHook = SetWinEventHook(
 	    EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,

@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2019 Matt Campbell
+// Copyright (c) 2012-2021 Matt Campbell
 // MIT license (see License.txt)
 
 #include "imgui_utils.h"
@@ -80,6 +80,17 @@ namespace ImGui
 	}
 
 	bool Begin(const char *name, b32 *p_open, ImGuiWindowFlags flags)
+	{
+		if(!p_open) {
+			return Begin(name, (bool *)nullptr, flags);
+		}
+		bool b = *p_open != 0;
+		bool ret = Begin(name, &b, flags);
+		*p_open = b;
+		return ret;
+	}
+
+	bool Begin(const char *name, b8 *p_open, ImGuiWindowFlags flags)
 	{
 		if(!p_open) {
 			return Begin(name, (bool *)nullptr, flags);
@@ -670,7 +681,8 @@ namespace ImGui
 
 		// Render
 		if(hovered || selected) {
-			const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_HeaderActive : hovered ? ImGuiCol_HeaderHovered : ImGuiCol_Header);
+			const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_HeaderActive : hovered ? ImGuiCol_HeaderHovered
+			                                                                                  : ImGuiCol_Header);
 			RenderFrame(bb.Min, bb.Max, col, false, 0.0f);
 			RenderNavHighlight(bb, id, ImGuiNavHighlightFlags_TypeThin | ImGuiNavHighlightFlags_NoRounding);
 		} else {

@@ -36,7 +36,7 @@ void Style_Apply(const char *colorscheme)
 	s.ColumnsMinSpacing *= dpiScale;
 	s.ScrollbarSize *= dpiScale;
 	s.ScrollbarRounding *= dpiScale;
-	s.GrabMinSize *= dpiScale;
+	s.GrabMinSize = 40 * dpiScale;
 	s.GrabRounding *= dpiScale;
 	s.DisplayWindowPadding.x *= dpiScale;
 	s.DisplayWindowPadding.y *= dpiScale;
@@ -102,7 +102,6 @@ void StyleColorsWindows()
 
 	style->ScrollbarSize = 20.0f * dpiScale;
 	style->ScrollbarRounding = 0.0f;
-	style->GrabMinSize = 5.0f * dpiScale;
 	style->GrabRounding = 0.0f;
 
 	ImVec4 white = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);

@@ -629,10 +629,10 @@ namespace ImGui
 
 		bool item_add;
 		if(flags & ImGuiSelectableFlags_Disabled) {
-			ImGuiItemFlags backup_item_flags = window->DC.ItemFlags;
-			window->DC.ItemFlags |= ImGuiItemFlags_Disabled | ImGuiItemFlags_NoNavDefaultFocus;
+			ImGuiItemFlags backup_item_flags = g.CurrentItemFlags;
+			g.CurrentItemFlags |= ImGuiItemFlags_Disabled | ImGuiItemFlags_NoNavDefaultFocus;
 			item_add = ItemAdd(bb, id);
-			window->DC.ItemFlags = backup_item_flags;
+			g.CurrentItemFlags = backup_item_flags;
 		} else {
 			item_add = ItemAdd(bb, id);
 		}
@@ -651,7 +651,7 @@ namespace ImGui
 		if(flags & ImGuiSelectableFlags_SelectOnRelease)
 			button_flags |= ImGuiButtonFlags_PressedOnRelease;
 		if(flags & ImGuiSelectableFlags_Disabled)
-			button_flags |= ImGuiButtonFlags_Disabled;
+			button_flags |= ImGuiItemFlags_Disabled;
 		if(flags & ImGuiSelectableFlags_AllowDoubleClick)
 			button_flags |= ImGuiButtonFlags_PressedOnClickRelease | ImGuiButtonFlags_PressedOnDoubleClick;
 		if(flags & ImGuiSelectableFlags_AllowItemOverlap)
@@ -667,7 +667,7 @@ namespace ImGui
 		if(pressed || hovered)
 			if(!g.NavDisableMouseHover && g.NavWindow == window && g.NavLayer == window->DC.NavLayerCurrent) {
 				g.NavDisableHighlight = true;
-				SetNavID(id, window->DC.NavLayerCurrent, window->DC.NavFocusScopeIdCurrent);
+				SetNavID(id, window->DC.NavLayerCurrent, window->DC.NavFocusScopeIdCurrent, ImRect());
 			}
 		if(pressed)
 			MarkItemEdited(id);
@@ -677,7 +677,7 @@ namespace ImGui
 
 		// In this branch, Selectable() cannot toggle the selection so this will never trigger.
 		if(selected != was_selected) //-V547
-			window->DC.LastItemStatusFlags |= ImGuiItemStatusFlags_ToggledSelection;
+			g.LastItemData.StatusFlags |= ImGuiItemStatusFlags_ToggledSelection;
 
 		// Render
 		if(hovered || selected) {
@@ -704,10 +704,10 @@ namespace ImGui
 			PopStyleColor();
 
 		// Automatically close popups
-		if(pressed && (window->Flags & ImGuiWindowFlags_Popup) && !(flags & ImGuiSelectableFlags_DontClosePopups) && !(window->DC.ItemFlags & ImGuiItemFlags_SelectableDontClosePopup))
+		if(pressed && (window->Flags & ImGuiWindowFlags_Popup) && !(flags & ImGuiSelectableFlags_DontClosePopups) && !(g.CurrentItemFlags & ImGuiItemFlags_SelectableDontClosePopup))
 			CloseCurrentPopup();
 
-		IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
+		IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.CurrentItemFlags);
 		return pressed;
 	}
 

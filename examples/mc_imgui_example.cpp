@@ -40,7 +40,7 @@ static void MC_Imgui_Example_MainMenuBar(void)
 		if(ImGui::BeginMenu("Edit")) {
 			if(ImGui::MenuItem("Config")) {
 				BB_LOG("UI::Menu::Config", "UIConfig_Open");
-				messageBox mb = { BB_EMPTY_INITIALIZER };
+				messageBox mb = {};
 				sdict_add_raw(&mb.data, "title", "Config error");
 				sdict_add_raw(&mb.data, "text", "Failed to open config UI.\nThis is an example that doesn't have config save/load.");
 				sdict_add_raw(&mb.data, "button1", "Ok");

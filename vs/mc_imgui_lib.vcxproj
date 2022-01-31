@@ -150,8 +150,8 @@
     <ClInclude Include="..\include\wrap_imgui.h" />
     <ClInclude Include="..\include\wrap_imgui_internal.h" />
     <ClInclude Include="..\include\wrap_shellscalingapi.h" />
-    <ClInclude Include="..\submodules\imgui\examples\imgui_impl_dx9.h" />
-    <ClInclude Include="..\submodules\imgui\examples\imgui_impl_win32.h" />
+    <ClInclude Include="..\submodules\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="..\submodules\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="..\submodules\imgui\imconfig.h" />
     <ClInclude Include="..\submodules\imgui\imgui.h" />
     <ClInclude Include="..\submodules\imgui\imgui_internal.h" />
@@ -173,10 +173,10 @@
     <ClCompile Include="..\src\mc_imgui_json_generated.c" />
     <ClCompile Include="..\src\mc_imgui_structs_generated.c" />
     <ClCompile Include="..\src\ui_message_box.cpp" />
-    <ClCompile Include="..\submodules\imgui\examples\imgui_impl_dx9.cpp">
+    <ClCompile Include="..\submodules\imgui\backends\imgui_impl_dx9.cpp">
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\submodules\imgui\examples\imgui_impl_win32.cpp">
+    <ClCompile Include="..\submodules\imgui\backends\imgui_impl_win32.cpp">
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ClCompile Include="..\submodules\imgui\imgui.cpp">
@@ -186,6 +186,9 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ClCompile Include="..\submodules\imgui\imgui_draw.cpp">
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="..\submodules\imgui\imgui_tables.cpp">
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ClCompile Include="..\submodules\imgui\imgui_widgets.cpp">

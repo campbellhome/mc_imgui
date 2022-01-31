@@ -21,8 +21,8 @@ BB_WARNING_PUSH(4820 4255 4668 4574 4365)
 
 #include "imgui.h"
 
-#include "examples/imgui_impl_dx9.h"
-#include "examples/imgui_impl_win32.h"
+#include "backends/imgui_impl_dx9.h"
+#include "backends/imgui_impl_win32.h"
 #include "forkawesome-webfont.h"
 #if BB_USING(FEATURE_FREETYPE)
 #include "misc/freetype/imgui_freetype.h"
